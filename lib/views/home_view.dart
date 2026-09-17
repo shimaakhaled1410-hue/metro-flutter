@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/metro_controller.dart';
 import 'history_view.dart';
+import 'widgets/station_picker_sheet.dart';
 
 class HomeView extends StatelessWidget {
   HomeView({super.key});
@@ -9,117 +10,127 @@ class HomeView extends StatelessWidget {
   final MetroController controller = Get.put(MetroController());
   final TextEditingController placeSearchController = TextEditingController();
 
-  void _showStationPicker(BuildContext context, {required bool isStart}) {
+  void _openStationPicker(BuildContext context, {required bool isStart}) {
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => StationPickerSheet(
+        title: isStart ? 'Select Departure Station' : 'Select Destination Station',
+        onSelected: (stationName) {
+          if (isStart) {
+            controller.selectStartStation(stationName);
+          } else {
+            controller.selectEndStation(stationName);
+          }
+          Navigator.pop(context);
+        },
       ),
-      builder: (_) {
-        return Container(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Text(
-                isStart ? 'Select Start Station' : 'Select End Station',
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const Divider(),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: controller.allStations.length,
-                  itemBuilder: (context, index) {
-                    final station = controller.allStations[index];
-                    return ListTile(
-                      title: Text(station.name),
-                      subtitle: Text(station.lines.join(' | ')),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () {
-                        if (isStart) {
-                          controller.selectStartStation(station.name);
-                        } else {
-                          controller.selectEndStation(station.name);
-                        }
-                        Navigator.pop(context);
-                      },
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        );
-      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    const primaryColor = Color(0xFF1B3A57);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Cairo Metro Navigator'),
+        title: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.directions_subway, color: primaryColor),
+            SizedBox(width: 8),
+            Text('Cairo Metro'),
+          ],
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.history),
+            icon: const Icon(Icons.history_rounded),
             tooltip: 'Trip History',
             onPressed: () => Get.to(() => const HistoryView()),
           ),
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Start Station Selection Card
+            // Start Station Card
             Card(
-              elevation: 2,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               child: Padding(
-                padding: const EdgeInsets.all(12.0),
+                padding: const EdgeInsets.all(14.0),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.trip_origin, color: Colors.green),
+                        const Icon(Icons.trip_origin, color: Color(0xFF43A047), size: 20),
                         const SizedBox(width: 8),
-                        Expanded(
-                          child: Obx(() => Text(
-                                controller.startStationName.value.isEmpty
-                                    ? 'Select Start Station'
-                                    : controller.startStationName.value,
-                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                              )),
+                        const Text(
+                          'Starting Point',
+                          style: TextStyle(fontSize: 13, color: Colors.grey, fontWeight: FontWeight.bold),
                         ),
-                        ElevatedButton(
-                          onPressed: () => _showStationPicker(context, isStart: true),
-                          child: const Text('Choose'),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            icon: const Icon(Icons.my_location),
-                            label: Obx(() => controller.isLoadingLocation.value
-                                ? const SizedBox(
-                                    height: 16,
-                                    width: 16,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
-                                  )
-                                : const Text('Nearest to Me')),
-                            onPressed: () => controller.findNearestToCurrentLocation(),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        IconButton.filledTonal(
-                          icon: const Icon(Icons.map_outlined),
-                          tooltip: 'Open Station on Google Maps',
+                        const Spacer(),
+                        IconButton(
+                          visualDensity: VisualDensity.compact,
+                          icon: const Icon(Icons.map_outlined, color: primaryColor, size: 22),
+                          tooltip: 'Open on Maps',
                           onPressed: () => controller.openStartStationMap(),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 6),
+                    InkWell(
+                      borderRadius: BorderRadius.circular(10),
+                      onTap: () => _openStationPicker(context, isStart: true),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF1F4F9),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Obx(() => Text(
+                                    controller.startStationName.value.isEmpty
+                                        ? 'Tap to select start station'
+                                        : controller.startStationName.value,
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: controller.startStationName.value.isEmpty
+                                          ? FontWeight.normal
+                                          : FontWeight.bold,
+                                      color: controller.startStationName.value.isEmpty
+                                          ? Colors.grey.shade600
+                                          : primaryColor,
+                                    ),
+                                  )),
+                            ),
+                            const Icon(Icons.arrow_drop_down, color: primaryColor),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: Colors.grey.shade300),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                        icon: const Icon(Icons.my_location, size: 18, color: primaryColor),
+                        label: Obx(() => controller.isLoadingLocation.value
+                            ? const SizedBox(
+                                height: 16,
+                                width: 16,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : const Text('Use Nearest Station to Me', style: TextStyle(color: primaryColor))),
+                        onPressed: () => controller.findNearestToCurrentLocation(),
+                      ),
                     ),
                   ],
                 ),
@@ -127,49 +138,76 @@ class HomeView extends StatelessWidget {
             ),
             const SizedBox(height: 12),
 
-            // Destination Station Selection Card
+            // Destination Station Card
             Card(
-              elevation: 2,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               child: Padding(
-                padding: const EdgeInsets.all(12.0),
+                padding: const EdgeInsets.all(14.0),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
+                    const Row(
                       children: [
-                        const Icon(Icons.location_on, color: Colors.red),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Obx(() => Text(
-                                controller.endStationName.value.isEmpty
-                                    ? 'Select End Station'
-                                    : controller.endStationName.value,
-                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                              )),
-                        ),
-                        ElevatedButton(
-                          onPressed: () => _showStationPicker(context, isStart: false),
-                          child: const Text('Choose'),
+                        Icon(Icons.location_on, color: Color(0xFFE53935), size: 20),
+                        SizedBox(width: 8),
+                        Text(
+                          'Destination',
+                          style: TextStyle(fontSize: 13, color: Colors.grey, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
+                    const SizedBox(height: 6),
+                    InkWell(
+                      borderRadius: BorderRadius.circular(10),
+                      onTap: () => _openStationPicker(context, isStart: false),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF1F4F9),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Obx(() => Text(
+                                    controller.endStationName.value.isEmpty
+                                        ? 'Tap to select destination'
+                                        : controller.endStationName.value,
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: controller.endStationName.value.isEmpty
+                                          ? FontWeight.normal
+                                          : FontWeight.bold,
+                                      color: controller.endStationName.value.isEmpty
+                                          ? Colors.grey.shade600
+                                          : primaryColor,
+                                    ),
+                                  )),
+                            ),
+                            const Icon(Icons.arrow_drop_down, color: primaryColor),
+                          ],
+                        ),
+                      ),
+                    ),
                     const SizedBox(height: 12),
-                    // Place search field for Feature 4
                     Row(
                       children: [
                         Expanded(
                           child: TextField(
                             controller: placeSearchController,
+                            style: const TextStyle(fontSize: 14),
                             decoration: const InputDecoration(
-                              isDense: true,
-                              hintText: 'e.g. Abbas El Akkad, Cairo Univ...',
-                              border: OutlineInputBorder(),
-                              prefixIcon: Icon(Icons.search),
+                              hintText: 'Going to an area? (e.g. Abbas El Akkad)',
+                              prefixIcon: Icon(Icons.travel_explore, size: 18),
                             ),
                           ),
                         ),
                         const SizedBox(width: 8),
                         ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: primaryColor,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
                           onPressed: () {
                             controller.findNearestStationForDestination(
                               placeSearchController.text,
@@ -179,7 +217,7 @@ class HomeView extends StatelessWidget {
                               ? const SizedBox(
                                   height: 16,
                                   width: 16,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                                 )
                               : const Text('Find')),
                         ),
@@ -192,17 +230,25 @@ class HomeView extends StatelessWidget {
             const SizedBox(height: 16),
 
             // Calculate Button
-            FilledButton.icon(
-              icon: const Icon(Icons.alt_route),
-              label: const Padding(
-                padding: EdgeInsets.symmetric(vertical: 12),
-                child: Text('Calculate Route', style: TextStyle(fontSize: 16)),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: primaryColor,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               onPressed: () => controller.calculateTrip(),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.alt_route_rounded, size: 20),
+                  SizedBox(width: 8),
+                  Text('Calculate Trip', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                ],
+              ),
             ),
             const SizedBox(height: 16),
 
-            // Results Section
+            // Results View
             Obx(() {
               if (!controller.hasCalculated.value) {
                 return const SizedBox.shrink();
@@ -211,71 +257,49 @@ class HomeView extends StatelessWidget {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Trip Summary Card
+                  // Overview stats
                   Card(
-                    color: Theme.of(context).colorScheme.primaryContainer,
+                    color: const Color(0xFF1B3A57),
                     child: Padding(
-                      padding: const EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          Column(
-                            children: [
-                              const Icon(Icons.train),
-                              const SizedBox(height: 4),
-                              Text(
-                                '${controller.stationCount.value} Stations',
-                                style: const TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              const Icon(Icons.timer),
-                              const SizedBox(height: 4),
-                              Text(
-                                '${controller.tripTime.value} Min',
-                                style: const TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              const Icon(Icons.confirmation_number),
-                              const SizedBox(height: 4),
-                              Text(
-                                '${controller.ticketPrice.value} EGP',
-                                style: const TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
+                          _buildStatItem('Stations', '${controller.stationCount.value}', Icons.train_outlined),
+                          _buildStatItem('Est. Time', '${controller.tripTime.value} min', Icons.timer_outlined),
+                          _buildStatItem('Ticket', '${controller.ticketPrice.value} EGP', Icons.confirmation_number_outlined),
                         ],
                       ),
                     ),
                   ),
                   const SizedBox(height: 12),
 
-                  // Route Instructions
+                  // Directions steps
                   if (controller.instructions.isNotEmpty)
                     Card(
                       child: Padding(
-                        padding: const EdgeInsets.all(12.0),
+                        padding: const EdgeInsets.all(14.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text(
-                              'Directions:',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                              'Transit Directions',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: primaryColor),
                             ),
-                            const SizedBox(height: 8),
+                            const Divider(height: 16),
                             ...controller.instructions.map((inst) => Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 2),
+                                  padding: const EdgeInsets.symmetric(vertical: 4),
                                   child: Row(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      const Icon(Icons.arrow_right, size: 20),
-                                      const SizedBox(width: 4),
-                                      Expanded(child: Text(inst)),
+                                      const Icon(Icons.arrow_forward_rounded, size: 18, color: primaryColor),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          inst,
+                                          style: const TextStyle(fontSize: 14, height: 1.3),
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 )),
@@ -285,57 +309,83 @@ class HomeView extends StatelessWidget {
                     ),
                   const SizedBox(height: 12),
 
-                  // Scrollable Route Stations List
-                  const Text(
-                    'Full Route:',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  // Route station list (Scrollable)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                    child: Text(
+                      'Stations Timeline',
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: primaryColor),
+                    ),
                   ),
-                  const SizedBox(height: 8),
                   Container(
-                    height: 250,
+                    height: 280,
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade300),
-                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.grey.shade200),
                     ),
                     child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
                       itemCount: controller.routeStations.length,
                       itemBuilder: (context, index) {
                         final station = controller.routeStations[index];
                         final isFirst = index == 0;
                         final isLast = index == controller.routeStations.length - 1;
 
+                        Color indicatorColor = Colors.blueGrey.shade300;
+                        if (isFirst) indicatorColor = const Color(0xFF43A047);
+                        if (isLast) indicatorColor = const Color(0xFFE53935);
+
                         return ListTile(
                           dense: true,
                           leading: CircleAvatar(
-                            radius: 12,
-                            backgroundColor: isFirst
-                                ? Colors.green
-                                : (isLast ? Colors.red : Colors.blueGrey),
+                            radius: 13,
+                            backgroundColor: indicatorColor,
                             child: Text(
                               '${index + 1}',
-                              style: const TextStyle(fontSize: 11, color: Colors.white),
+                              style: const TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.bold),
                             ),
                           ),
                           title: Text(
                             station.name,
                             style: TextStyle(
-                              fontWeight: isFirst || isLast ? FontWeight.bold : FontWeight.normal,
+                              fontSize: 14,
+                              fontWeight: isFirst || isLast ? FontWeight.bold : FontWeight.w500,
+                              color: isFirst || isLast ? primaryColor : Colors.black87,
                             ),
                           ),
                           subtitle: Text(
-                            station.lines.join(', '),
-                            style: const TextStyle(fontSize: 11),
+                            station.lines.join(' | '),
+                            style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
                           ),
                         );
                       },
                     ),
                   ),
+                  const SizedBox(height: 20),
                 ],
               );
             }),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildStatItem(String label, String value, IconData icon) {
+    return Column(
+      children: [
+        Icon(icon, color: Colors.white70, size: 22),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+        ),
+        Text(
+          label,
+          style: const TextStyle(color: Colors.white60, fontSize: 11),
+        ),
+      ],
     );
   }
 }

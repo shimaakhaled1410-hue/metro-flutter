@@ -61,7 +61,8 @@ class _StationPickerSheetState extends State<StationPickerSheet>
     if (_searchQuery.isNotEmpty) {
       stations = stations
           .where((s) =>
-              s.name.toLowerCase().contains(_searchQuery.toLowerCase()))
+              s.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+              s.nameAr.contains(_searchQuery))
           .toList();
     }
 
@@ -111,7 +112,7 @@ class _StationPickerSheetState extends State<StationPickerSheet>
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    station.name,
+                    station.localizedName,
                     style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,

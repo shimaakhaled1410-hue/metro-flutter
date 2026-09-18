@@ -1,15 +1,23 @@
+import 'package:get/get.dart';
+
 class Station {
   final String name;
+  final String nameAr;
   final double latitude;
   final double longitude;
-  final List<String> lines; 
+  final List<String> lines;
 
   const Station({
     required this.name,
+    required this.nameAr,
     required this.latitude,
     required this.longitude,
     required this.lines,
   });
+
+  String get localizedName {
+    return Get.locale?.languageCode == 'ar' ? nameAr : name;
+  }
 
   @override
   bool operator ==(Object other) =>

@@ -122,30 +122,23 @@ class HomeView extends StatelessWidget {
                         child: Row(
                           children: [
                             Expanded(
-                              child: Obx(
-                                () => Text(
-                                  controller.startStationName.value.isEmpty
-                                      ? 'Tap to select start station'
-                                      : controller.startStationName.value,
+                              child: Obx(() {
+                                final station = controller.selectedStartStation;
+                                return Text(
+                                  station == null
+                                      ? 'tap_select_start'.tr
+                                      : station.localizedName,
                                   style: TextStyle(
                                     fontSize: 15,
-                                    fontWeight:
-                                        controller
-                                            .startStationName
-                                            .value
-                                            .isEmpty
+                                    fontWeight: station == null
                                         ? FontWeight.normal
                                         : FontWeight.bold,
-                                    color:
-                                        controller
-                                            .startStationName
-                                            .value
-                                            .isEmpty
+                                    color: station == null
                                         ? Colors.grey.shade600
                                         : primaryColor,
                                   ),
-                                ),
-                              ),
+                                );
+                              }),
                             ),
                             const Icon(
                               Icons.arrow_drop_down,
@@ -235,24 +228,23 @@ class HomeView extends StatelessWidget {
                         child: Row(
                           children: [
                             Expanded(
-                              child: Obx(
-                                () => Text(
-                                  controller.endStationName.value.isEmpty
-                                      ? 'Tap to select destination'
-                                      : controller.endStationName.value,
+                              child: Obx(() {
+                                final station = controller.selectedEndStation;
+                                return Text(
+                                  station == null
+                                      ? 'tap_select_end'.tr
+                                      : station.localizedName,
                                   style: TextStyle(
                                     fontSize: 15,
-                                    fontWeight:
-                                        controller.endStationName.value.isEmpty
+                                    fontWeight: station == null
                                         ? FontWeight.normal
                                         : FontWeight.bold,
-                                    color:
-                                        controller.endStationName.value.isEmpty
+                                    color: station == null
                                         ? Colors.grey.shade600
                                         : primaryColor,
                                   ),
-                                ),
-                              ),
+                                );
+                              }),
                             ),
                             const Icon(
                               Icons.arrow_drop_down,
@@ -473,7 +465,7 @@ class HomeView extends StatelessWidget {
                             ),
                           ),
                           title: Text(
-                            station.name,
+                            station.localizedName,
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: isFirst || isLast

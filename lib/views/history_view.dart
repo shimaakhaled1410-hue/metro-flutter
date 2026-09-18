@@ -18,9 +18,9 @@ class HistoryView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(HistoryController());
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F9FC),
       appBar: AppBar(
         title: Text('trip_history'.tr),
         actions: [
@@ -55,7 +55,7 @@ class HistoryView extends StatelessWidget {
           return Center(
             child: Text(
               'no_trips'.tr,
-              style: const TextStyle(fontSize: 16, color: Colors.grey),
+              style: TextStyle(fontSize: 16, color: Colors.grey.shade500),
             ),
           );
         }
@@ -73,11 +73,6 @@ class HistoryView extends StatelessWidget {
 
             return Card(
               margin: const EdgeInsets.only(bottom: 14),
-              elevation: 1.5,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-                side: BorderSide(color: Colors.grey.shade200),
-              ),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -87,7 +82,7 @@ class HistoryView extends StatelessWidget {
                       children: [
                         const Icon(
                           Icons.route,
-                          color: Color(0xFFD32F2F),
+                          color: Color(0xFFE53935),
                         ),
                         const SizedBox(width: 10),
                         Expanded(
@@ -126,7 +121,7 @@ class HistoryView extends StatelessWidget {
                               routeList[rIdx],
                               style: const TextStyle(fontSize: 12),
                             ),
-                            backgroundColor: const Color(0xFFF1F4F9),
+                            backgroundColor: isDark ? const Color(0xFF252A36) : const Color(0xFFF1F4F9),
                             side: BorderSide.none,
                           );
                         },

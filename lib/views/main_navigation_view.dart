@@ -22,7 +22,7 @@ class _MainNavigationViewState extends State<MainNavigationView> {
 
   @override
   Widget build(BuildContext context) {
-    const primaryColor = Color(0xFF1B3A57);
+    final primaryColor = Theme.of(context).colorScheme.primary;
 
     return Scaffold(
       body: IndexedStack(
@@ -32,21 +32,21 @@ class _MainNavigationViewState extends State<MainNavigationView> {
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
         onDestinationSelected: (idx) => setState(() => _currentIndex = idx),
-        indicatorColor: primaryColor.withOpacity(0.15),
+        indicatorColor: primaryColor.withValues(alpha: 0.18),
         destinations: [
           NavigationDestination(
             icon: const Icon(Icons.directions_subway_outlined),
-            selectedIcon: const Icon(Icons.directions_subway, color: primaryColor),
+            selectedIcon: Icon(Icons.directions_subway, color: primaryColor),
             label: 'nav_home'.tr,
           ),
           NavigationDestination(
             icon: const Icon(Icons.history_outlined),
-            selectedIcon: const Icon(Icons.history, color: primaryColor),
+            selectedIcon: Icon(Icons.history, color: primaryColor),
             label: 'nav_history'.tr,
           ),
           NavigationDestination(
             icon: const Icon(Icons.settings_outlined),
-            selectedIcon: const Icon(Icons.settings, color: primaryColor),
+            selectedIcon: Icon(Icons.settings, color: primaryColor),
             label: 'nav_settings'.tr,
           ),
         ],

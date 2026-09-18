@@ -10,10 +10,9 @@ class WelcomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final MetroController controller = Get.put(MetroController());
-    const primaryColor = Color(0xFF1B3A57);
+    final primaryColor = Theme.of(context).colorScheme.primary;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F9FC),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
@@ -26,10 +25,10 @@ class WelcomeView extends StatelessWidget {
                   width: 72,
                   height: 72,
                   decoration: BoxDecoration(
-                    color: primaryColor.withValues(alpha:0.1),
+                    color: primaryColor.withValues(alpha: 0.12),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.directions_subway_rounded,
                     size: 40,
                     color: primaryColor,
@@ -40,7 +39,7 @@ class WelcomeView extends StatelessWidget {
               Text(
                 'welcome_title'.tr,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                   color: primaryColor,
@@ -52,7 +51,7 @@ class WelcomeView extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.grey.shade600,
+                  color: Colors.grey.shade500,
                   height: 1.4,
                 ),
               ),
@@ -100,6 +99,7 @@ class WelcomeView extends StatelessWidget {
               FilledButton(
                 style: FilledButton.styleFrom(
                   backgroundColor: primaryColor,
+                  foregroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.black87 : Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
@@ -135,6 +135,8 @@ class WelcomeView extends StatelessWidget {
     required VoidCallback onTap,
     required Color primaryColor,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
@@ -142,10 +144,12 @@ class WelcomeView extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? primaryColor.withValues(alpha:0.04) : Colors.white,
+          color: isSelected
+              ? primaryColor.withValues(alpha: isDark ? 0.15 : 0.06)
+              : (isDark ? const Color(0xFF1E222B) : Colors.white),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? primaryColor : Colors.grey.shade200,
+            color: isSelected ? primaryColor : (isDark ? const Color(0xFF2C3240) : Colors.grey.shade200),
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -155,12 +159,14 @@ class WelcomeView extends StatelessWidget {
               width: 46,
               height: 46,
               decoration: BoxDecoration(
-                color: isSelected ? primaryColor : Colors.grey.shade100,
+                color: isSelected ? primaryColor : (isDark ? const Color(0xFF2A303C) : Colors.grey.shade100),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 icon,
-                color: isSelected ? Colors.white : Colors.grey.shade700,
+                color: isSelected
+                    ? (isDark ? Colors.black87 : Colors.white)
+                    : (isDark ? Colors.grey.shade400 : Colors.grey.shade700),
                 size: 24,
               ),
             ),
@@ -174,7 +180,7 @@ class WelcomeView extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
-                      color: isSelected ? primaryColor : Colors.black87,
+                      color: isSelected ? primaryColor : (isDark ? Colors.white : Colors.black87),
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -182,7 +188,7 @@ class WelcomeView extends StatelessWidget {
                     subtitle,
                     style: TextStyle(
                       fontSize: 12,
-                      color: Colors.grey.shade600,
+                      color: Colors.grey.shade500,
                     ),
                   ),
                 ],
@@ -190,7 +196,7 @@ class WelcomeView extends StatelessWidget {
             ),
             Icon(
               isSelected ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
-              color: isSelected ? primaryColor : Colors.grey.shade400,
+              color: isSelected ? primaryColor : Colors.grey.shade500,
               size: 22,
             ),
           ],

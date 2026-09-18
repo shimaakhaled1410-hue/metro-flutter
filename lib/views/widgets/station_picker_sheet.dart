@@ -71,13 +71,14 @@ class _StationPickerSheetState extends State<StationPickerSheet>
   }
 
   Widget _buildLineList(int lineIndex, Color lineColor) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final stations = _getStationsForLine(lineIndex);
 
     if (stations.isEmpty) {
       return Center(
         child: Text(
           'no_trips'.tr,
-          style: const TextStyle(color: Colors.grey),
+          style: TextStyle(color: Colors.grey.shade500),
         ),
       );
     }
@@ -96,9 +97,11 @@ class _StationPickerSheetState extends State<StationPickerSheet>
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             decoration: BoxDecoration(
-              color: Colors.grey.shade50,
+              color: isDark ? const Color(0xFF252A36) : const Color(0xFFF9FAFB),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade200),
+              border: Border.all(
+                color: isDark ? const Color(0xFF2E3544) : Colors.grey.shade200,
+              ),
             ),
             child: Row(
               children: [
@@ -114,9 +117,10 @@ class _StationPickerSheetState extends State<StationPickerSheet>
                 Expanded(
                   child: Text(
                     station.localizedName,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
+                      color: isDark ? Colors.white : Colors.black87,
                     ),
                   ),
                 ),
@@ -124,7 +128,7 @@ class _StationPickerSheetState extends State<StationPickerSheet>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: Colors.amber.shade100,
+                      color: isDark ? Colors.amber.shade900.withValues(alpha: 0.3) : Colors.amber.shade100,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -132,12 +136,16 @@ class _StationPickerSheetState extends State<StationPickerSheet>
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
-                        color: Colors.amber.shade900,
+                        color: isDark ? Colors.amber.shade200 : Colors.amber.shade900,
                       ),
                     ),
                   ),
                 const SizedBox(width: 6),
-                const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  size: 14,
+                  color: Colors.grey.shade500,
+                ),
               ],
             ),
           ),
@@ -148,11 +156,14 @@ class _StationPickerSheetState extends State<StationPickerSheet>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primaryColor = Theme.of(context).colorScheme.primary;
+
     return Container(
       height: MediaQuery.of(context).size.height * 0.78,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
         children: [
@@ -161,7 +172,7 @@ class _StationPickerSheetState extends State<StationPickerSheet>
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Colors.grey.shade300,
+              color: isDark ? const Color(0xFF333B4D) : Colors.grey.shade300,
               borderRadius: BorderRadius.circular(10),
             ),
           ),
@@ -173,7 +184,11 @@ class _StationPickerSheetState extends State<StationPickerSheet>
               children: [
                 Text(
                   widget.title,
-                  style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : primaryColor,
+                  ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.close, size: 20),
@@ -187,6 +202,12 @@ class _StationPickerSheetState extends State<StationPickerSheet>
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
+                filled: true,
+                fillColor: isDark ? const Color(0xFF1E222B) : Colors.grey.shade100,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
                 hintText: 'search_station'.tr,
                 prefixIcon: const Icon(Icons.search, size: 20),
                 suffixIcon: _searchQuery.isNotEmpty
@@ -204,8 +225,8 @@ class _StationPickerSheetState extends State<StationPickerSheet>
           ),
           TabBar(
             controller: _tabController,
-            indicatorColor: const Color(0xFF1B3A57),
-            labelColor: const Color(0xFF1B3A57),
+            indicatorColor: primaryColor,
+            labelColor: primaryColor,
             unselectedLabelColor: Colors.grey,
             labelStyle: const TextStyle(fontWeight: FontWeight.bold),
             tabs: [

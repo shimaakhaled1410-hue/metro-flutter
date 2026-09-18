@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../data/metro_data.dart';
 import '../../models/station_model.dart';
 
@@ -22,9 +23,9 @@ class _StationPickerSheetState extends State<StationPickerSheet>
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
-  static const Color line1Color = Color(0xFF1E88E5); // Blue
-  static const Color line2Color = Color(0xFFE53935); // Red
-  static const Color line3Color = Color(0xFF43A047); // Green
+  static const Color line1Color = Color(0xFF1E88E5);
+  static const Color line2Color = Color(0xFFE53935);
+  static const Color line3Color = Color(0xFF43A047);
 
   @override
   void initState() {
@@ -73,10 +74,10 @@ class _StationPickerSheetState extends State<StationPickerSheet>
     final stations = _getStationsForLine(lineIndex);
 
     if (stations.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
-          'No stations match your search',
-          style: TextStyle(color: Colors.grey),
+          'no_trips'.tr,
+          style: const TextStyle(color: Colors.grey),
         ),
       );
     }
@@ -84,7 +85,7 @@ class _StationPickerSheetState extends State<StationPickerSheet>
     return ListView.separated(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       itemCount: stations.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 6),
+      separatorBuilder: (_, __) => const SizedBox(height: 6),
       itemBuilder: (context, index) {
         final station = stations[index];
         final isInterchange = station.lines.length > 1;
@@ -127,7 +128,7 @@ class _StationPickerSheetState extends State<StationPickerSheet>
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      'Transfer: ${station.lines.join(" / ")}',
+                      'transfer'.tr,
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
@@ -136,7 +137,7 @@ class _StationPickerSheetState extends State<StationPickerSheet>
                     ),
                   ),
                 const SizedBox(width: 6),
-                const Icon(Icons.chevron_right, size: 18, color: Colors.grey),
+                const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
               ],
             ),
           ),
@@ -186,7 +187,7 @@ class _StationPickerSheetState extends State<StationPickerSheet>
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'Search station...',
+                hintText: 'search_station'.tr,
                 prefixIcon: const Icon(Icons.search, size: 20),
                 suffixIcon: _searchQuery.isNotEmpty
                     ? IconButton(
@@ -207,14 +208,14 @@ class _StationPickerSheetState extends State<StationPickerSheet>
             labelColor: const Color(0xFF1B3A57),
             unselectedLabelColor: Colors.grey,
             labelStyle: const TextStyle(fontWeight: FontWeight.bold),
-            tabs: const [
+            tabs: [
               Tab(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    CircleAvatar(radius: 4, backgroundColor: line1Color),
-                    SizedBox(width: 6),
-                    Text('Line 1'),
+                    const CircleAvatar(radius: 4, backgroundColor: line1Color),
+                    const SizedBox(width: 6),
+                    Text('line_1'.tr),
                   ],
                 ),
               ),
@@ -222,9 +223,9 @@ class _StationPickerSheetState extends State<StationPickerSheet>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    CircleAvatar(radius: 4, backgroundColor: line2Color),
-                    SizedBox(width: 6),
-                    Text('Line 2'),
+                    const CircleAvatar(radius: 4, backgroundColor: line2Color),
+                    const SizedBox(width: 6),
+                    Text('line_2'.tr),
                   ],
                 ),
               ),
@@ -232,9 +233,9 @@ class _StationPickerSheetState extends State<StationPickerSheet>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    CircleAvatar(radius: 4, backgroundColor: line3Color),
-                    SizedBox(width: 6),
-                    Text('Line 3'),
+                    const CircleAvatar(radius: 4, backgroundColor: line3Color),
+                    const SizedBox(width: 6),
+                    Text('line_3'.tr),
                   ],
                 ),
               ),

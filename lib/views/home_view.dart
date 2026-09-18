@@ -16,9 +16,7 @@ class HomeView extends StatelessWidget {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => StationPickerSheet(
-        title: isStart
-            ? 'Select Departure Station'
-            : 'Select Destination Station',
+        title: isStart ? 'select_dep_station'.tr : 'select_dest_station'.tr,
         onSelected: (stationName) {
           if (isStart) {
             controller.selectStartStation(stationName);
@@ -37,12 +35,12 @@ class HomeView extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Row(
+        title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.directions_subway, color: primaryColor),
-            SizedBox(width: 8),
-            Text('Cairo Metro'),
+            const Icon(Icons.directions_subway, color: primaryColor),
+            const SizedBox(width: 8),
+            Text('app_title'.tr),
           ],
         ),
         actions: [
@@ -57,10 +55,9 @@ class HomeView extends StatelessWidget {
               }
             },
           ),
-          const SizedBox(width: 8),
           IconButton(
             icon: const Icon(Icons.history_rounded),
-            tooltip: 'Trip History',
+            tooltip: 'trip_history'.tr,
             onPressed: () => Get.to(() => const HistoryView()),
           ),
         ],
@@ -70,7 +67,6 @@ class HomeView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Start Station Card
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(14.0),
@@ -79,29 +75,16 @@ class HomeView extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        const Icon(
-                          Icons.trip_origin,
-                          color: Color(0xFF43A047),
-                          size: 20,
-                        ),
+                        const Icon(Icons.trip_origin, color: Color(0xFF43A047), size: 20),
                         const SizedBox(width: 8),
-                        const Text(
-                          'Starting Point',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        Text(
+                          'starting_point'.tr,
+                          style: const TextStyle(fontSize: 13, color: Colors.grey, fontWeight: FontWeight.bold),
                         ),
                         const Spacer(),
                         IconButton(
                           visualDensity: VisualDensity.compact,
-                          icon: const Icon(
-                            Icons.map_outlined,
-                            color: primaryColor,
-                            size: 22,
-                          ),
-                          tooltip: 'Open on Maps',
+                          icon: const Icon(Icons.map_outlined, color: primaryColor, size: 22),
                           onPressed: () => controller.openStartStationMap(),
                         ),
                       ],
@@ -111,10 +94,7 @@ class HomeView extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                       onTap: () => _openStationPicker(context, isStart: true),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 12,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                         decoration: BoxDecoration(
                           color: const Color(0xFFF1F4F9),
                           borderRadius: BorderRadius.circular(10),
@@ -125,25 +105,16 @@ class HomeView extends StatelessWidget {
                               child: Obx(() {
                                 final station = controller.selectedStartStation;
                                 return Text(
-                                  station == null
-                                      ? 'tap_select_start'.tr
-                                      : station.localizedName,
+                                  station == null ? 'tap_select_start'.tr : station.localizedName,
                                   style: TextStyle(
                                     fontSize: 15,
-                                    fontWeight: station == null
-                                        ? FontWeight.normal
-                                        : FontWeight.bold,
-                                    color: station == null
-                                        ? Colors.grey.shade600
-                                        : primaryColor,
+                                    fontWeight: station == null ? FontWeight.normal : FontWeight.bold,
+                                    color: station == null ? Colors.grey.shade600 : primaryColor,
                                   ),
                                 );
                               }),
                             ),
-                            const Icon(
-                              Icons.arrow_drop_down,
-                              color: primaryColor,
-                            ),
+                            const Icon(Icons.arrow_drop_down, color: primaryColor),
                           ],
                         ),
                       ),
@@ -154,31 +125,17 @@ class HomeView extends StatelessWidget {
                       child: OutlinedButton.icon(
                         style: OutlinedButton.styleFrom(
                           side: BorderSide(color: Colors.grey.shade300),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         ),
-                        icon: const Icon(
-                          Icons.my_location,
-                          size: 18,
-                          color: primaryColor,
-                        ),
-                        label: Obx(
-                          () => controller.isLoadingLocation.value
-                              ? const SizedBox(
-                                  height: 16,
-                                  width: 16,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : const Text(
-                                  'Use Nearest Station to Me',
-                                  style: TextStyle(color: primaryColor),
-                                ),
-                        ),
-                        onPressed: () =>
-                            controller.findNearestToCurrentLocation(),
+                        icon: const Icon(Icons.my_location, size: 18, color: primaryColor),
+                        label: Obx(() => controller.isLoadingLocation.value
+                            ? const SizedBox(
+                                height: 16,
+                                width: 16,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : Text('use_nearest_me'.tr, style: const TextStyle(color: primaryColor))),
+                        onPressed: () => controller.findNearestToCurrentLocation(),
                       ),
                     ),
                   ],
@@ -186,29 +143,19 @@ class HomeView extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-
-            // Destination Station Card
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(14.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Row(
+                    Row(
                       children: [
-                        Icon(
-                          Icons.location_on,
-                          color: Color(0xFFE53935),
-                          size: 20,
-                        ),
-                        SizedBox(width: 8),
+                        const Icon(Icons.location_on, color: Color(0xFFE53935), size: 20),
+                        const SizedBox(width: 8),
                         Text(
-                          'Destination',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          'destination'.tr,
+                          style: const TextStyle(fontSize: 13, color: Colors.grey, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
@@ -217,10 +164,7 @@ class HomeView extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                       onTap: () => _openStationPicker(context, isStart: false),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 12,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                         decoration: BoxDecoration(
                           color: const Color(0xFFF1F4F9),
                           borderRadius: BorderRadius.circular(10),
@@ -231,25 +175,16 @@ class HomeView extends StatelessWidget {
                               child: Obx(() {
                                 final station = controller.selectedEndStation;
                                 return Text(
-                                  station == null
-                                      ? 'tap_select_end'.tr
-                                      : station.localizedName,
+                                  station == null ? 'tap_select_end'.tr : station.localizedName,
                                   style: TextStyle(
                                     fontSize: 15,
-                                    fontWeight: station == null
-                                        ? FontWeight.normal
-                                        : FontWeight.bold,
-                                    color: station == null
-                                        ? Colors.grey.shade600
-                                        : primaryColor,
+                                    fontWeight: station == null ? FontWeight.normal : FontWeight.bold,
+                                    color: station == null ? Colors.grey.shade600 : primaryColor,
                                   ),
                                 );
                               }),
                             ),
-                            const Icon(
-                              Icons.arrow_drop_down,
-                              color: primaryColor,
-                            ),
+                            const Icon(Icons.arrow_drop_down, color: primaryColor),
                           ],
                         ),
                       ),
@@ -261,10 +196,9 @@ class HomeView extends StatelessWidget {
                           child: TextField(
                             controller: placeSearchController,
                             style: const TextStyle(fontSize: 14),
-                            decoration: const InputDecoration(
-                              hintText:
-                                  'Going to an area? (e.g. Abbas El Akkad)',
-                              prefixIcon: Icon(Icons.travel_explore, size: 18),
+                            decoration: InputDecoration(
+                              hintText: 'going_area_hint'.tr,
+                              prefixIcon: const Icon(Icons.travel_explore, size: 18),
                             ),
                           ),
                         ),
@@ -273,27 +207,20 @@ class HomeView extends StatelessWidget {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: primaryColor,
                             foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           ),
                           onPressed: () {
                             controller.findNearestStationForDestination(
                               placeSearchController.text,
                             );
                           },
-                          child: Obx(
-                            () => controller.isSearchingPlace.value
-                                ? const SizedBox(
-                                    height: 16,
-                                    width: 16,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: Colors.white,
-                                    ),
-                                  )
-                                : const Text('Find'),
-                          ),
+                          child: Obx(() => controller.isSearchingPlace.value
+                              ? const SizedBox(
+                                  height: 16,
+                                  width: 16,
+                                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                )
+                              : Text('find'.tr)),
                         ),
                       ],
                     ),
@@ -302,32 +229,23 @@ class HomeView extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-
-            // Calculate Button
             FilledButton(
               style: FilledButton.styleFrom(
                 backgroundColor: primaryColor,
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               onPressed: () => controller.calculateTrip(),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.alt_route_rounded, size: 20),
-                  SizedBox(width: 8),
-                  Text(
-                    'Calculate Trip',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
+                  const Icon(Icons.alt_route_rounded, size: 20),
+                  const SizedBox(width: 8),
+                  Text('calculate_trip'.tr, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
             const SizedBox(height: 16),
-
-            // Results View
             Obx(() {
               if (!controller.hasCalculated.value) {
                 return const SizedBox.shrink();
@@ -336,39 +254,21 @@ class HomeView extends StatelessWidget {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Overview stats
                   Card(
                     color: const Color(0xFF1B3A57),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 16.0,
-                        horizontal: 8.0,
-                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          _buildStatItem(
-                            'Stations',
-                            '${controller.stationCount.value}',
-                            Icons.train_outlined,
-                          ),
-                          _buildStatItem(
-                            'Est. Time',
-                            '${controller.tripTime.value} min',
-                            Icons.timer_outlined,
-                          ),
-                          _buildStatItem(
-                            'Ticket',
-                            '${controller.ticketPrice.value} EGP',
-                            Icons.confirmation_number_outlined,
-                          ),
+                          _buildStatItem('stations'.tr, '${controller.stationCount.value}', Icons.train_outlined),
+                          _buildStatItem('est_time'.tr, '${controller.tripTime.value} ${'min'.tr}', Icons.timer_outlined),
+                          _buildStatItem('ticket'.tr, '${controller.ticketPrice.value} ${'egp'.tr}', Icons.confirmation_number_outlined),
                         ],
                       ),
                     ),
                   ),
                   const SizedBox(height: 12),
-
-                  // Directions steps
                   if (controller.instructions.isNotEmpty)
                     Card(
                       child: Padding(
@@ -376,58 +276,37 @@ class HomeView extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'Transit Directions',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                                color: primaryColor,
-                              ),
+                            Text(
+                              'transit_directions'.tr,
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: primaryColor),
                             ),
                             const Divider(height: 16),
-                            ...controller.instructions.map(
-                              (inst) => Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 4,
-                                ),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Icon(
-                                      Icons.arrow_forward_rounded,
-                                      size: 18,
-                                      color: primaryColor,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: Text(
-                                        inst,
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          height: 1.3,
+                            ...controller.instructions.map((inst) => Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 4),
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Icon(Icons.arrow_forward_rounded, size: 18, color: primaryColor),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          inst,
+                                          style: const TextStyle(fontSize: 14, height: 1.3),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
+                                    ],
+                                  ),
+                                )),
                           ],
                         ),
                       ),
                     ),
                   const SizedBox(height: 12),
-
-                  // Route station list (Scrollable)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
                     child: Text(
-                      'Stations Timeline',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                        color: primaryColor,
-                      ),
+                      'stations_timeline'.tr,
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: primaryColor),
                     ),
                   ),
                   Container(
@@ -443,8 +322,7 @@ class HomeView extends StatelessWidget {
                       itemBuilder: (context, index) {
                         final station = controller.routeStations[index];
                         final isFirst = index == 0;
-                        final isLast =
-                            index == controller.routeStations.length - 1;
+                        final isLast = index == controller.routeStations.length - 1;
 
                         Color indicatorColor = Colors.blueGrey.shade300;
                         if (isFirst) indicatorColor = const Color(0xFF43A047);
@@ -457,31 +335,20 @@ class HomeView extends StatelessWidget {
                             backgroundColor: indicatorColor,
                             child: Text(
                               '${index + 1}',
-                              style: const TextStyle(
-                                fontSize: 11,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: const TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.bold),
                             ),
                           ),
                           title: Text(
                             station.localizedName,
                             style: TextStyle(
                               fontSize: 14,
-                              fontWeight: isFirst || isLast
-                                  ? FontWeight.bold
-                                  : FontWeight.w500,
-                              color: isFirst || isLast
-                                  ? primaryColor
-                                  : Colors.black87,
+                              fontWeight: isFirst || isLast ? FontWeight.bold : FontWeight.w500,
+                              color: isFirst || isLast ? primaryColor : Colors.black87,
                             ),
                           ),
                           subtitle: Text(
                             station.lines.join(' | '),
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: Colors.grey.shade600,
-                            ),
+                            style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
                           ),
                         );
                       },
@@ -504,11 +371,7 @@ class HomeView extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           value,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 15,
-          ),
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
         ),
         Text(
           label,

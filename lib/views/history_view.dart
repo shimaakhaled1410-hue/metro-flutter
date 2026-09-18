@@ -1,9 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/history_controller.dart';
+import '../data/metro_data.dart';
 
 class HistoryView extends StatelessWidget {
   const HistoryView({super.key});
+
+  String _getStationName(String name) {
+    try {
+      final station = MetroData.allStations.firstWhere((s) => s.name == name);
+      return station.localizedName;
+    } catch (_) {
+      return name;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -11,18 +21,18 @@ class HistoryView extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Trip History'),
+        title: Text('trip_history'.tr),
         actions: [
           IconButton(
             icon: const Icon(Icons.delete_sweep),
-            tooltip: 'Clear All',
+            tooltip: 'clear_history'.tr,
             onPressed: () {
               if (controller.historyList.isNotEmpty) {
                 Get.defaultDialog(
-                  title: 'Clear History',
-                  middleText: 'Are you sure you want to delete all saved trips?',
-                  textConfirm: 'Delete',
-                  textCancel: 'Cancel',
+                  title: 'clear_history'.tr,
+                  middleText: 'clear_history_confirm'.tr,
+                  textConfirm: 'delete'.tr,
+                  textCancel: 'cancel'.tr,
                   confirmTextColor: Colors.white,
                   buttonColor: Colors.red,
                   onConfirm: () {
@@ -41,10 +51,10 @@ class HistoryView extends StatelessWidget {
         }
 
         if (controller.historyList.isEmpty) {
-          return const Center(
+          return Center(
             child: Text(
-              'No previous trips found.',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
+              'no_trips'.tr,
+              style: const TextStyle(fontSize: 16, color: Colors.grey),
             ),
           );
         }
@@ -52,9 +62,12 @@ class HistoryView extends StatelessWidget {
         return ListView.separated(
           padding: const EdgeInsets.all(12),
           itemCount: controller.historyList.length,
-          separatorBuilder: (_, _) => const SizedBox(height: 8),
+          separatorBuilder: (_, __) => const SizedBox(height: 8),
           itemBuilder: (context, index) {
             final item = controller.historyList[index];
+            final startName = _getStationName(item.startStation);
+            final endName = _getStationName(item.endStation);
+
             return Card(
               elevation: 2,
               shape: RoundedRectangleBorder(
@@ -66,11 +79,11 @@ class HistoryView extends StatelessWidget {
                   child: Icon(Icons.train, color: Theme.of(context).primaryColor),
                 ),
                 title: Text(
-                  '${item.startStation} → ${item.endStation}',
+                  '$startName → $endName',
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 subtitle: Text(
-                  'Stations: ${item.stationCount} | Time: ${item.timeInMinutes} min | Price: ${item.price} EGP',
+                  '${'stations'.tr}: ${item.stationCount} | ${'est_time'.tr}: ${item.timeInMinutes} ${'min'.tr} | ${'ticket'.tr}: ${item.price} ${'egp'.tr}',
                 ),
                 trailing: IconButton(
                   icon: const Icon(Icons.delete_outline, color: Colors.red),

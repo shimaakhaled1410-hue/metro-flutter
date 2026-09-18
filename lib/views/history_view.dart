@@ -67,12 +67,16 @@ class HistoryView extends StatelessWidget {
             final item = controller.historyList[index];
             final start = _getStationName(item.startStation);
             final dest = _getStationName(item.endStation);
+            final routeList = item.routeStations.isNotEmpty
+                ? item.routeStations.map((e) => _getStationName(e)).toList()
+                : [start, dest];
 
             return Card(
-              margin: const EdgeInsets.only(bottom: 12),
-              elevation: 2,
+              margin: const EdgeInsets.only(bottom: 14),
+              elevation: 1.5,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
+                side: BorderSide(color: Colors.grey.shade200),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -101,28 +105,31 @@ class HistoryView extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 8),
                     Text(
                       '${item.stationCount} ${'stations'.tr} • ${item.timeInMinutes} ${'est_time'.tr} • ${item.price} ${'ticket'.tr}',
                       style: const TextStyle(fontWeight: FontWeight.w500),
                     ),
                     const SizedBox(height: 12),
                     SizedBox(
-                      height: 40,
-                      child: Row(
-                        children: [
-                          Chip(
-                            label: Text(start, style: const TextStyle(fontSize: 12)),
-                            backgroundColor: Colors.grey.shade100,
-                          ),
-                          const SizedBox(width: 6),
-                          const Icon(Icons.arrow_forward, size: 16, color: Colors.grey),
-                          const SizedBox(width: 6),
-                          Chip(
-                            label: Text(dest, style: const TextStyle(fontSize: 12)),
-                            backgroundColor: Colors.grey.shade100,
-                          ),
-                        ],
+                      height: 44,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: routeList.length,
+                        separatorBuilder: (_, __) => const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 4),
+                          child: Icon(Icons.arrow_forward, size: 16, color: Colors.grey),
+                        ),
+                        itemBuilder: (context, rIdx) {
+                          return Chip(
+                            label: Text(
+                              routeList[rIdx],
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                            backgroundColor: const Color(0xFFF1F4F9),
+                            side: BorderSide.none,
+                          );
+                        },
                       ),
                     ),
                   ],

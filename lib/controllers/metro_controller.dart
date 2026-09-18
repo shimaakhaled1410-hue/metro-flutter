@@ -85,7 +85,7 @@ class MetroController extends GetxController {
     }
   }
 
-  void _persistTrip(TripResult result) {
+ void _persistTrip(TripResult result) {
     final trip = TripHistory(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       startStation: startStationName.value,
@@ -94,6 +94,7 @@ class MetroController extends GetxController {
       timeInMinutes: result.estimatedTimeMinutes,
       price: result.ticketPrice,
       timestamp: DateTime.now(),
+      routeStations: result.path.map((s) => s.name).toList(),
     );
 
     HistoryService.saveTrip(trip).then((_) {

@@ -31,9 +31,15 @@ class HomeView extends StatelessWidget {
     );
   }
 
+  String _getCommonLine(Station s1, Station s2) {
+    final common = s1.lines.where((l) => s2.lines.contains(l)).toList();
+    return common.isNotEmpty ? common.first : '';
+  }
+
   @override
   Widget build(BuildContext context) {
     const primaryColor = Color(0xFF1B3A57);
+    const timelineColor = Color(0xFF5C6BC0);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF7F9FC),
@@ -257,36 +263,51 @@ class HomeView extends StatelessWidget {
                 return const SizedBox.shrink();
               }
 
+              final isSameRoute = fastest.stationCount == comfortable.stationCount &&
+                  fastest.transferCount == comfortable.transferCount;
+
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text('route_options'.tr, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: primaryColor)),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildRouteOptionCard(
-                          title: 'fastest_route'.tr,
-                          trip: fastest,
-                          isSelected: controller.selectedRouteIndex.value == 0,
-                          onTap: () => controller.selectRouteOption(0),
-                          primaryColor: primaryColor,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: _buildRouteOptionCard(
-                          title: 'fewest_transfers'.tr,
-                          trip: comfortable,
-                          isSelected: controller.selectedRouteIndex.value == 1,
-                          onTap: () => controller.selectRouteOption(1),
-                          primaryColor: primaryColor,
-                        ),
-                      ),
-                    ],
+                  Text(
+                    isSameRoute ? 'transit_directions'.tr : 'route_options'.tr,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: primaryColor),
                   ),
+                  const SizedBox(height: 10),
+                  if (isSameRoute)
+                    _buildRouteOptionCard(
+                      title: 'fastest_route'.tr,
+                      trip: fastest,
+                      isSelected: true,
+                      onTap: () {},
+                      primaryColor: primaryColor,
+                    )
+                  else
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildRouteOptionCard(
+                            title: 'fastest_route'.tr,
+                            trip: fastest,
+                            isSelected: controller.selectedRouteIndex.value == 0,
+                            onTap: () => controller.selectRouteOption(0),
+                            primaryColor: primaryColor,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: _buildRouteOptionCard(
+                            title: 'fewest_transfers'.tr,
+                            trip: comfortable,
+                            isSelected: controller.selectedRouteIndex.value == 1,
+                            onTap: () => controller.selectRouteOption(1),
+                            primaryColor: primaryColor,
+                          ),
+                        ),
+                      ],
+                    ),
                   const SizedBox(height: 16),
-                  _buildTimelineCard(controller.activeTrip!, primaryColor),
+                  _buildVerticalTimeline(controller.activeTrip!, primaryColor, timelineColor),
                 ],
               );
             }),
@@ -347,50 +368,142 @@ class HomeView extends StatelessWidget {
     );
   }
 
-  Widget _buildTimelineCard(TripResult trip, Color primaryColor) {
+  Widget _buildVerticalTimeline(TripResult trip, Color primaryColor, Color timelineColor) {
     return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 1,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+        side: BorderSide(color: Colors.grey.shade200),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                const Icon(Icons.route, color: Color(0xFFD32F2F)),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    '${trip.path.first.localizedName} → ${trip.path.last.localizedName}',
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
             Text(
-              '${trip.stationCount} ${'stations'.tr} • ${trip.estimatedTimeMinutes} ${'est_time'.tr} • ${trip.ticketPrice} ${'ticket'.tr}',
-              style: const TextStyle(fontWeight: FontWeight.w500),
+              'stations_timeline'.tr,
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: primaryColor),
             ),
             const SizedBox(height: 12),
-            SizedBox(
-              height: 48,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: trip.path.length,
-                separatorBuilder: (_, __) => const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 4),
-                  child: Icon(Icons.arrow_forward, size: 16, color: Colors.grey),
-                ),
-                itemBuilder: (context, idx) {
-                  final st = trip.path[idx];
-                  return Chip(
-                    label: Text(st.localizedName, style: const TextStyle(fontSize: 12)),
-                    backgroundColor: Colors.grey.shade100,
-                  );
-                },
-              ),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: trip.path.length,
+              itemBuilder: (context, index) {
+                final station = trip.path[index];
+                final isFirst = index == 0;
+                final isLast = index == trip.path.length - 1;
+
+                String? transferText;
+                if (!isFirst && !isLast) {
+                  final prevLine = _getCommonLine(trip.path[index - 1], station);
+                  final nextLine = _getCommonLine(station, trip.path[index + 1]);
+                  if (prevLine != nextLine && nextLine.isNotEmpty && prevLine.isNotEmpty) {
+                    transferText = '${'transfer'.tr} $nextLine';
+                  }
+                }
+
+                return IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      SizedBox(
+                        width: 30,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            if (!isLast)
+                              Positioned(
+                                top: 14,
+                                bottom: 0,
+                                child: Container(width: 3, color: timelineColor.withOpacity(0.6)),
+                              ),
+                            if (!isFirst)
+                              Positioned(
+                                top: 0,
+                                bottom: 14,
+                                child: Container(width: 3, color: timelineColor.withOpacity(0.6)),
+                              ),
+                            Container(
+                              width: 14,
+                              height: 14,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: (isFirst || isLast) ? timelineColor : Colors.white,
+                                border: Border.all(color: timelineColor, width: 3),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      station.localizedName,
+                                      style: TextStyle(
+                                        color: primaryColor,
+                                        fontSize: 15,
+                                        fontWeight: (isFirst || isLast) ? FontWeight.bold : FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                  if (isFirst)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade200,
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: const Text('Start', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                                    ),
+                                  if (isLast)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade200,
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: const Text('End', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                                    ),
+                                ],
+                              ),
+                              if (transferText != null) ...[
+                                const SizedBox(height: 6),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: timelineColor,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(Icons.sync_alt_rounded, color: Colors.white, size: 14),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        transferText,
+                                        style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
           ],
         ),

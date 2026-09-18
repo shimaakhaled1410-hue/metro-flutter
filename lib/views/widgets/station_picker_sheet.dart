@@ -54,27 +54,121 @@ class _StationPickerSheetState extends State<StationPickerSheet>
       }.toList();
     }
 
-    var stations = names
+    return names
         .map((name) =>
             MetroData.allStations.firstWhere((st) => st.name == name))
         .toList();
+  }
 
-    if (_searchQuery.isNotEmpty) {
-      stations = stations
-          .where((s) =>
-              s.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-              s.nameAr.contains(_searchQuery))
-          .toList();
-    }
+  List<Station> _getAllSearchResults() {
+    final query = _searchQuery.trim().toLowerCase();
+    return MetroData.allStations.where((s) {
+      return s.name.toLowerCase().contains(query) || s.nameAr.contains(query);
+    }).toList();
+  }
 
-    return stations;
+  Color _getStationColor(Station station) {
+    if (station.lines.contains('Line 1')) return line1Color;
+    if (station.lines.contains('Line 2')) return line2Color;
+    return line3Color;
+  }
+
+  Widget _buildStationTile(Station station, Color indicatorColor) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isInterchange = station.lines.length > 1;
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: () => widget.onSelected(station.name),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF252A36) : const Color(0xFFF9FAFB),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isDark ? const Color(0xFF2E3544) : Colors.grey.shade200,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(
+                color: indicatorColor,
+                shape: BoxShape.circle,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    station.localizedName,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? Colors.white : Colors.black87,
+                    ),
+                  ),
+                  if (_searchQuery.isNotEmpty) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      station.lines.join(' | '),
+                      style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            if (isInterchange)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? Colors.amber.shade900.withValues(alpha: 0.3)
+                      : Colors.amber.shade100,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  'transfer'.tr,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.amber.shade200 : Colors.amber.shade900,
+                  ),
+                ),
+              ),
+            const SizedBox(width: 6),
+            Icon(
+              Icons.arrow_forward_ios,
+              size: 14,
+              color: Colors.grey.shade500,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildLineList(int lineIndex, Color lineColor) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final stations = _getStationsForLine(lineIndex);
 
-    if (stations.isEmpty) {
+    return ListView.separated(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      itemCount: stations.length,
+      separatorBuilder: (_, __) => const SizedBox(height: 6),
+      itemBuilder: (context, index) {
+        return _buildStationTile(stations[index], lineColor);
+      },
+    );
+  }
+
+  Widget _buildGlobalSearchResults() {
+    final results = _getAllSearchResults();
+
+    if (results.isEmpty) {
       return Center(
         child: Text(
           'no_trips'.tr,
@@ -85,71 +179,11 @@ class _StationPickerSheetState extends State<StationPickerSheet>
 
     return ListView.separated(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      itemCount: stations.length,
+      itemCount: results.length,
       separatorBuilder: (_, __) => const SizedBox(height: 6),
       itemBuilder: (context, index) {
-        final station = stations[index];
-        final isInterchange = station.lines.length > 1;
-
-        return InkWell(
-          borderRadius: BorderRadius.circular(12),
-          onTap: () => widget.onSelected(station.name),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF252A36) : const Color(0xFFF9FAFB),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: isDark ? const Color(0xFF2E3544) : Colors.grey.shade200,
-              ),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 10,
-                  height: 10,
-                  decoration: BoxDecoration(
-                    color: lineColor,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    station.localizedName,
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: isDark ? Colors.white : Colors.black87,
-                    ),
-                  ),
-                ),
-                if (isInterchange)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: isDark ? Colors.amber.shade900.withValues(alpha: 0.3) : Colors.amber.shade100,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      'transfer'.tr,
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.amber.shade200 : Colors.amber.shade900,
-                      ),
-                    ),
-                  ),
-                const SizedBox(width: 6),
-                Icon(
-                  Icons.arrow_forward_ios,
-                  size: 14,
-                  color: Colors.grey.shade500,
-                ),
-              ],
-            ),
-          ),
-        );
+        final station = results[index];
+        return _buildStationTile(station, _getStationColor(station));
       },
     );
   }
@@ -158,6 +192,7 @@ class _StationPickerSheetState extends State<StationPickerSheet>
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final primaryColor = Theme.of(context).colorScheme.primary;
+    final isSearching = _searchQuery.trim().isNotEmpty;
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.78,
@@ -223,56 +258,63 @@ class _StationPickerSheetState extends State<StationPickerSheet>
               onChanged: (value) => setState(() => _searchQuery = value),
             ),
           ),
-          TabBar(
-            controller: _tabController,
-            indicatorColor: primaryColor,
-            labelColor: primaryColor,
-            unselectedLabelColor: Colors.grey,
-            labelStyle: const TextStyle(fontWeight: FontWeight.bold),
-            tabs: [
-              Tab(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const CircleAvatar(radius: 4, backgroundColor: line1Color),
-                    const SizedBox(width: 6),
-                    Text('line_1'.tr),
-                  ],
-                ),
-              ),
-              Tab(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const CircleAvatar(radius: 4, backgroundColor: line2Color),
-                    const SizedBox(width: 6),
-                    Text('line_2'.tr),
-                  ],
-                ),
-              ),
-              Tab(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const CircleAvatar(radius: 4, backgroundColor: line3Color),
-                    const SizedBox(width: 6),
-                    Text('line_3'.tr),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Expanded(
-            child: TabBarView(
+          if (!isSearching) ...[
+            TabBar(
               controller: _tabController,
-              children: [
-                _buildLineList(0, line1Color),
-                _buildLineList(1, line2Color),
-                _buildLineList(2, line3Color),
+              indicatorColor: primaryColor,
+              labelColor: primaryColor,
+              unselectedLabelColor: Colors.grey,
+              labelStyle: const TextStyle(fontWeight: FontWeight.bold),
+              tabs: [
+                Tab(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const CircleAvatar(radius: 4, backgroundColor: line1Color),
+                      const SizedBox(width: 6),
+                      Text('line_1'.tr),
+                    ],
+                  ),
+                ),
+                Tab(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const CircleAvatar(radius: 4, backgroundColor: line2Color),
+                      const SizedBox(width: 6),
+                      Text('line_2'.tr),
+                    ],
+                  ),
+                ),
+                Tab(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const CircleAvatar(radius: 4, backgroundColor: line3Color),
+                      const SizedBox(width: 6),
+                      Text('line_3'.tr),
+                    ],
+                  ),
+                ),
               ],
             ),
-          ),
+            const SizedBox(height: 8),
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildLineList(0, line1Color),
+                  _buildLineList(1, line2Color),
+                  _buildLineList(2, line3Color),
+                ],
+              ),
+            ),
+          ] else ...[
+            const SizedBox(height: 8),
+            Expanded(
+              child: _buildGlobalSearchResults(),
+            ),
+          ],
         ],
       ),
     );

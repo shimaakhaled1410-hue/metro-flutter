@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../controllers/metro_controller.dart';
 import '../models/station_model.dart';
 import '../services/metro_graph_service.dart';
+import 'welcome_view.dart';
 import 'widgets/station_picker_sheet.dart';
 
 class HomeView extends StatelessWidget {
@@ -54,32 +55,33 @@ class HomeView extends StatelessWidget {
             Card(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               child: Padding(
-                padding: const EdgeInsets.all(14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                child: Row(
                   children: [
-                    Text('passenger_type'.tr, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.grey)),
-                    const SizedBox(height: 8),
-                    Obx(() => Wrap(
-                          spacing: 8,
-                          children: [
-                            ChoiceChip(
-                              label: Text('normal_passenger'.tr),
-                              selected: controller.passengerType.value == PassengerType.normal,
-                              onSelected: (_) => controller.setPassengerType(PassengerType.normal),
-                            ),
-                            ChoiceChip(
-                              label: Text('senior_passenger'.tr),
-                              selected: controller.passengerType.value == PassengerType.senior,
-                              onSelected: (_) => controller.setPassengerType(PassengerType.senior),
-                            ),
-                            ChoiceChip(
-                              label: Text('special_needs'.tr),
-                              selected: controller.passengerType.value == PassengerType.specialNeeds,
-                              onSelected: (_) => controller.setPassengerType(PassengerType.specialNeeds),
-                            ),
-                          ],
-                        )),
+                    const Icon(Icons.badge_outlined, color: primaryColor, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'passenger_type'.tr,
+                      style: const TextStyle(fontSize: 13, color: Colors.grey, fontWeight: FontWeight.bold),
+                    ),
+                    const Spacer(),
+                    Obx(() {
+                      String label = 'normal_passenger'.tr;
+                      if (controller.passengerType.value == PassengerType.senior) {
+                        label = 'senior_passenger'.tr;
+                      } else if (controller.passengerType.value == PassengerType.specialNeeds) {
+                        label = 'special_needs'.tr;
+                      }
+                      return InkWell(
+                        borderRadius: BorderRadius.circular(8),
+                        onTap: () => Get.to(() => const WelcomeView()),
+                        child: Chip(
+                          label: Text(label, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                          backgroundColor: primaryColor.withOpacity(0.08),
+                          side: BorderSide.none,
+                        ),
+                      );
+                    }),
                   ],
                 ),
               ),

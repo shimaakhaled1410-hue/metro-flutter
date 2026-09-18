@@ -2,8 +2,8 @@ import 'package:device_preview/device_preview.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:metro/views/welcome_view.dart';
 import 'utils/app_translations.dart';
-import 'views/main_navigation_view.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,7 +46,7 @@ class CairoMetroApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const MainNavigationView(),
+      home: const WelcomeView(),
     );
   }
 }

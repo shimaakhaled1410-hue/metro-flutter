@@ -59,19 +59,80 @@ class LocationService {
   }
 
   static Future<Station?> findNearestStationToPlace(String placeName) async {
-    try {
-      String searchQuery = placeName.contains('Egypt') || placeName.contains('Cairo')
-          ? placeName
-          : '$placeName, Cairo, Egypt';
+    final cleanQuery = placeName.trim().toLowerCase();
 
-      List<Location> locations = await locationFromAddress(searchQuery);
+    final Map<String, String> popularPlaces = {
+      'abbas el akkad': 'Stadium',
+      'abbas elakkad': 'Stadium',
+      'عباس العقاد': 'Stadium',
+      'makram ebeid': 'Stadium',
+      'مكرم عبيد': 'Stadium',
+      'city stars': 'Al-Ahram',
+      'سيتي ستارز': 'Al-Ahram',
+      'el salam': 'Adly Mansour',
+      'salam': 'Adly Mansour',
+      'السلام': 'Adly Mansour',
+      'مدينة السلام': 'Adly Mansour',
+      'cairo university': 'Cairo University',
+      'جامعة القاهرة': 'Cairo University',
+      'ain shams university': 'El Demerdash',
+      'جامعة عين شمس': 'El Demerdash',
+      'tahrir': 'El Sadat',
+      'التحرير': 'El Sadat',
+      'downtown': 'El Sadat',
+      'وسط البلد': 'El Sadat',
+      'ramses': 'El Shohadaa',
+      'رمسيس': 'El Shohadaa',
+      'محطة مصر': 'El Shohadaa',
+      'al azhar': 'Bab El-Shaaria',
+      'el hussein': 'Bab El-Shaaria',
+      'الحسين': 'Bab El-Shaaria',
+      'الازهر': 'Bab El-Shaaria',
+      'zamalek': 'Safaa Hijazy',
+      'الزمالك': 'Safaa Hijazy',
+      'mohandessin': 'Gamaat El Dowal',
+      'المهندسين': 'Gamaat El Dowal',
+      'cairo festival': 'Al-Ahram',
+      'كوديرو فيستيفال': 'Al-Ahram',
+      'nasr city': 'Stadium',
+      'مدينة نصر': 'Stadium',
+      'heliopolis': 'Heliopolis',
+      'مصر الجديدة': 'Heliopolis',
+      'maadi': 'Maadi',
+      'المعادي': 'Maadi',
+      'giza zoo': 'Opera',
+      'حديقة الحيوان': 'Opera',
+      'cairo tower': 'Opera',
+      'برج القاهرة': 'Opera',
+    };
+
+    for (var key in popularPlaces.keys) {
+      if (cleanQuery.contains(key) || key.contains(cleanQuery)) {
+        final stationName = popularPlaces[key]!;
+        try {
+          return MetroData.allStations.firstWhere((s) => s.name == stationName);
+        } catch (_) {}
+      }
+    }
+
+    try {
+      List<Location> locations = await locationFromAddress('$placeName, Egypt');
       if (locations.isNotEmpty) {
         final loc = locations.first;
         return findNearestStation(loc.latitude, loc.longitude);
       }
     } catch (_) {
-      return null;
+      try {
+        List<Location> locations = await locationFromAddress(placeName);
+        if (locations.isNotEmpty) {
+          final loc = locations.first;
+          return findNearestStation(loc.latitude, loc.longitude);
+        }
+      } catch (_) {
+        return null;
+      }
     }
+
     return null;
   }
 }

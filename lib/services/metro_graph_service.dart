@@ -1,156 +1,179 @@
-import 'dart:collection';
 import '../data/metro_data.dart';
 import '../models/station_model.dart';
+import 'dart:collection';
+
+enum PassengerType { normal, senior, specialNeeds }
 
 class MetroGraphService {
-  final Map<String, List<String>> _graph = {};
-  final Map<String, Station> _stationLookup = {};
+  final Map<String, List<String>> _adjacencyList = {};
 
   MetroGraphService() {
-    _initGraph();
+    _buildGraph();
   }
 
-  void _addConnection(String a, String b) {
-    _graph.putIfAbsent(a, () => []).add(b);
-    _graph.putIfAbsent(b, () => []).add(a);
+  void _buildGraph() {
+    _addBidirectionalEdges(MetroData.line1Names);
+    _addBidirectionalEdges(MetroData.line2Names);
+    _addBidirectionalEdges(MetroData.line3Common);
+    _addBidirectionalEdges(MetroData.line3BranchA);
+    _addBidirectionalEdges(MetroData.line3BranchB);
+
+    _addTransfer("Kit Kat", ["El-Tawfiqiya", "Sudan"]);
+    _addTransfer("Adly Mansour", ["El Haykestep"]);
   }
 
-  void _addLineConnections(List<String> stations) {
+  void _addBidirectionalEdges(List<String> stations) {
     for (int i = 0; i < stations.length - 1; i++) {
-      _addConnection(stations[i], stations[i + 1]);
+      _addEdge(stations[i], stations[i + 1]);
+      _addEdge(stations[i + 1], stations[i]);
     }
   }
 
-  void _initGraph() {
-    for (var s in MetroData.allStations) {
-      _stationLookup[s.name] = s;
+  void _addEdge(String u, String v) {
+    _adjacencyList.putIfAbsent(u, () => []);
+    if (!_adjacencyList[u]!.contains(v)) {
+      _adjacencyList[u]!.add(v);
     }
-
-    _addLineConnections(MetroData.line1Names);
-    _addLineConnections(MetroData.line2Names);
-    _addLineConnections(MetroData.line3Common);
-    _addLineConnections(MetroData.line3BranchA);
-    _addLineConnections(MetroData.line3BranchB);
   }
 
-  Station? getStationByName(String name) => _stationLookup[name];
+  void _addTransfer(String station, List<String> branches) {
+    for (var b in branches) {
+      _addEdge(station, b);
+      _addEdge(b, station);
+    }
+  }
 
-  TripResult? calculateTrip(String startName, String endName) {
-    if (startName == endName) {
-      final station = getStationByName(startName);
-      if (station == null) return null;
+  Station? getStationByName(String name) {
+    try {
+      return MetroData.allStations.firstWhere((s) => s.name == name);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  int calculateTicketPrice(int stationCount, PassengerType type) {
+    if (type == PassengerType.specialNeeds) return 5;
+
+    int normalPrice;
+    if (stationCount <= 9) {
+      normalPrice = 8;
+    } else if (stationCount <= 16) {
+      normalPrice = 10;
+    } else if (stationCount <= 23) {
+      normalPrice = 15;
+    } else {
+      normalPrice = 20;
+    }
+
+    if (type == PassengerType.senior) {
+      return (normalPrice / 2).ceil();
+    }
+    return normalPrice;
+  }
+
+  int countTransfers(List<String> path) {
+    if (path.length < 2) return 0;
+    int transfers = 0;
+    String currentLine = _getCommonLine(path[0], path[1]);
+
+    for (int i = 1; i < path.length - 1; i++) {
+      String nextLine = _getCommonLine(path[i], path[i + 1]);
+      if (currentLine != nextLine && nextLine.isNotEmpty && currentLine.isNotEmpty) {
+        transfers++;
+        currentLine = nextLine;
+      }
+    }
+    return transfers;
+  }
+
+  String _getCommonLine(String s1Name, String s2Name) {
+    final s1 = getStationByName(s1Name);
+    final s2 = getStationByName(s2Name);
+    if (s1 == null || s2 == null) return '';
+    final common = s1.lines.where((l) => s2.lines.contains(l)).toList();
+    return common.isNotEmpty ? common.first : '';
+  }
+
+  List<String> generateInstructions(List<Station> path) {
+    if (path.length < 2) return [];
+    List<String> steps = [];
+    String currentLine = _getCommonLine(path[0].name, path[1].name);
+    steps.add('Start at ${path[0].localizedName} ($currentLine)');
+
+    for (int i = 1; i < path.length - 1; i++) {
+      String nextLine = _getCommonLine(path[i].name, path[i + 1].name);
+      if (currentLine != nextLine && nextLine.isNotEmpty) {
+        steps.add('Transfer at ${path[i].localizedName} to $nextLine');
+        currentLine = nextLine;
+      }
+    }
+    steps.add('Arrive at destination: ${path.last.localizedName}');
+    return steps;
+  }
+
+  TripResult? calculateTrip(String start, String end, PassengerType passengerType, {bool preferFewerTransfers = false}) {
+    if (start == end) {
+      final s = getStationByName(start);
+      if (s == null) return null;
       return TripResult(
-        path: [station],
-        stationCount: 0,
+        path: [s],
+        stationCount: 1,
         estimatedTimeMinutes: 0,
-        ticketPrice: 0,
-        instructions: ["You are already at the destination."],
+        ticketPrice: calculateTicketPrice(1, passengerType),
+        instructions: ['You are already at the destination'],
+        transferCount: 0,
       );
     }
 
-    final queue = Queue<List<String>>();
-    final visited = <String>{};
+    List<List<String>> allPaths = [];
+    Queue<List<String>> queue = Queue();
+    queue.add([start]);
 
-    queue.add([startName]);
-    visited.add(startName);
+    while (queue.isNotEmpty && allPaths.length < 25) {
+      List<String> current = queue.removeFirst();
+      String last = current.last;
 
-    List<String>? foundPath;
-
-    while (queue.isNotEmpty) {
-      final currentPath = queue.removeFirst();
-      final currentStation = currentPath.last;
-
-      if (currentStation == endName) {
-        foundPath = currentPath;
-        break;
+      if (last == end) {
+        allPaths.add(current);
+        continue;
       }
 
-      for (var neighbor in _graph[currentStation] ?? []) {
-        if (!visited.contains(neighbor)) {
-          visited.add(neighbor);
-          queue.add([...currentPath, neighbor]);
+      for (String neighbor in _adjacencyList[last] ?? []) {
+        if (!current.contains(neighbor) && current.length <= 40) {
+          queue.add(List.from(current)..add(neighbor));
         }
       }
     }
 
-    if (foundPath == null) return null;
+    if (allPaths.isEmpty) return null;
 
-    final stationPath = foundPath
-        .map((name) => _stationLookup[name]!)
-        .toList();
+    if (preferFewerTransfers) {
+      allPaths.sort((a, b) {
+        int tA = countTransfers(a);
+        int tB = countTransfers(b);
+        if (tA != tB) return tA.compareTo(tB);
+        return a.length.compareTo(b.length);
+      });
+    } else {
+      allPaths.sort((a, b) {
+        if (a.length != b.length) return a.length.compareTo(b.length);
+        return countTransfers(a).compareTo(countTransfers(b));
+      });
+    }
 
-    final count = stationPath.length - 1;
-    final time = count * 2; 
-    final price = _calculateTicketPrice(count);
-    final instructions = _generateInstructions(foundPath);
+    final chosenPathNames = allPaths.first;
+    final path = chosenPathNames.map((name) => getStationByName(name)!).toList();
+    final stationCount = path.length;
+    final transfers = countTransfers(chosenPathNames);
+    final time = (stationCount * 2) + (transfers * 5);
 
     return TripResult(
-      path: stationPath,
-      stationCount: count,
+      path: path,
+      stationCount: stationCount,
       estimatedTimeMinutes: time,
-      ticketPrice: price,
-      instructions: instructions,
+      ticketPrice: calculateTicketPrice(stationCount, passengerType),
+      instructions: generateInstructions(path),
+      transferCount: transfers,
     );
-  }
-
-  int _calculateTicketPrice(int count) {
-    if (count <= 9) return 10;
-    if (count <= 16) return 12;
-    if (count <= 23) return 15;
-    return 20;
-  }
-
-  List<String> _generateInstructions(List<String> path) {
-    if (path.length <= 1) return ["You have arrived."];
-
-    final instructions = <String>[];
-    String currentLine = _getCommonLine(path[0], path[1]);
-    String lineDirection = _getLineDirection(currentLine, path[0], path[1]);
-
-    instructions.add("Take $currentLine towards ($lineDirection)");
-
-    for (int i = 1; i < path.length - 1; i++) {
-      String nextLine = _getCommonLine(path[i], path[i + 1]);
-      if (currentLine != nextLine) {
-        instructions.add("Change at (${path[i]}) to $nextLine");
-        currentLine = nextLine;
-        lineDirection = _getLineDirection(currentLine, path[i], path[i + 1]);
-        instructions.add("Take $currentLine towards ($lineDirection)");
-      }
-    }
-
-    return instructions;
-  }
-
-  String _getCommonLine(String s1, String s2) {
-    final st1 = _stationLookup[s1]!;
-    final st2 = _stationLookup[s2]!;
-    for (var line in st1.lines) {
-      if (st2.lines.contains(line)) return line;
-    }
-    return st1.lines.first;
-  }
-
-  String _getLineDirection(String line, String s1, String s2) {
-    List<String> lineList;
-    if (line == "Line 1") {
-      lineList = MetroData.line1Names;
-    } else if (line == "Line 2") {
-      lineList = MetroData.line2Names;
-    } else {
-      if (MetroData.line3BranchB.contains(s1) || MetroData.line3BranchB.contains(s2)) {
-        lineList = [...MetroData.line3Common, ...MetroData.line3BranchB.sublist(1)];
-      } else {
-        lineList = [...MetroData.line3Common, ...MetroData.line3BranchA.sublist(1)];
-      }
-    }
-
-    int i1 = lineList.indexOf(s1);
-    int i2 = lineList.indexOf(s2);
-
-    if (i1 != -1 && i2 != -1) {
-      return i2 > i1 ? lineList.last : lineList.first;
-    }
-    return "End of Line";
   }
 }

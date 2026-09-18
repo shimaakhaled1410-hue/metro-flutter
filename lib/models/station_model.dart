@@ -36,6 +36,7 @@ class TripResult {
   final int estimatedTimeMinutes;
   final int ticketPrice;
   final List<String> instructions;
+  final int transferCount;
 
   TripResult({
     required this.path,
@@ -43,5 +44,6 @@ class TripResult {
     required this.estimatedTimeMinutes,
     required this.ticketPrice,
     required this.instructions,
+    required this.transferCount,
   });
 }

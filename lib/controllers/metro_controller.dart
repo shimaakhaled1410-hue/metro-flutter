@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../data/metro_data.dart';
 import '../models/station_model.dart';
@@ -13,13 +12,11 @@ class MetroController extends GetxController {
 
   var startStationName = ''.obs;
   var endStationName = ''.obs;
+  var passengerType = PassengerType.normal.obs;
 
-  var routeStations = <Station>[].obs;
-  var instructions = <String>[].obs;
-  var stationCount = 0.obs;
-  var tripTime = 0.obs;
-  var ticketPrice = 0.obs;
-  var hasCalculated = false.obs;
+  var fastestTrip = Rxn<TripResult>();
+  var comfortableTrip = Rxn<TripResult>();
+  var selectedRouteIndex = 0.obs;
 
   var isLoadingLocation = false.obs;
   var isSearchingPlace = false.obs;
@@ -32,6 +29,9 @@ class MetroController extends GetxController {
   Station? get selectedEndStation =>
       endStationName.value.isEmpty ? null : _graphService.getStationByName(endStationName.value);
 
+  TripResult? get activeTrip =>
+      selectedRouteIndex.value == 0 ? fastestTrip.value : comfortableTrip.value;
+
   void selectStartStation(String name) {
     startStationName.value = name;
   }
@@ -40,112 +40,95 @@ class MetroController extends GetxController {
     endStationName.value = name;
   }
 
+  void setPassengerType(PassengerType type) {
+    passengerType.value = type;
+    if (startStationName.value.isNotEmpty && endStationName.value.isNotEmpty) {
+      calculateTrip();
+    }
+  }
+
+  void selectRouteOption(int index) {
+    selectedRouteIndex.value = index;
+    final trip = activeTrip;
+    if (trip != null) {
+      _persistTrip(trip);
+    }
+  }
+
   void calculateTrip() {
     if (startStationName.value.isEmpty || endStationName.value.isEmpty) {
       Get.snackbar(
         'Warning',
-        'Please select both start and end stations first',
+        'Please select both start and destination stations',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.orange.withValues(alpha:0.9),
-        colorText: Colors.white,
-        margin: const EdgeInsets.all(12),
       );
       return;
     }
 
-    final result = _graphService.calculateTrip(
+    fastestTrip.value = _graphService.calculateTrip(
       startStationName.value,
       endStationName.value,
+      passengerType.value,
+      preferFewerTransfers: false,
     );
 
-    if (result != null) {
-      routeStations.assignAll(result.path);
-      instructions.assignAll(result.instructions);
-      stationCount.value = result.stationCount;
-      tripTime.value = result.estimatedTimeMinutes;
-      ticketPrice.value = result.ticketPrice;
-      hasCalculated.value = true;
+    comfortableTrip.value = _graphService.calculateTrip(
+      startStationName.value,
+      endStationName.value,
+      passengerType.value,
+      preferFewerTransfers: true,
+    );
 
-      if (result.stationCount > 0) {
-        final trip = TripHistory(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          startStation: startStationName.value,
-          endStation: endStationName.value,
-          stationCount: result.stationCount,
-          timeInMinutes: result.estimatedTimeMinutes,
-          price: result.ticketPrice,
-          timestamp: DateTime.now(),
-        );
-
-        HistoryService.saveTrip(trip).then((_) {
-          if (Get.isRegistered<HistoryController>()) {
-            Get.find<HistoryController>().loadHistory();
-          }
-        });
-      }
+    final tripToSave = activeTrip;
+    if (tripToSave != null) {
+      _persistTrip(tripToSave);
     }
   }
 
+  void _persistTrip(TripResult result) {
+    final trip = TripHistory(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      startStation: startStationName.value,
+      endStation: endStationName.value,
+      stationCount: result.stationCount,
+      timeInMinutes: result.estimatedTimeMinutes,
+      price: result.ticketPrice,
+      timestamp: DateTime.now(),
+    );
+
+    HistoryService.saveTrip(trip).then((_) {
+      if (Get.isRegistered<HistoryController>()) {
+        Get.find<HistoryController>().loadHistory();
+      }
+    });
+  }
+
   void openStartStationMap() {
-    if (selectedStartStation == null) {
-      Get.snackbar('Error', 'Select a start station first to open its location');
-      return;
+    if (selectedStartStation != null) {
+      LocationService.openStationOnMap(selectedStartStation!);
     }
-    LocationService.openStationOnMap(selectedStartStation!);
   }
 
   Future<void> findNearestToCurrentLocation() async {
     isLoadingLocation.value = true;
     try {
-      final position = await LocationService.getCurrentPosition();
-      if (position != null) {
-        final nearest = LocationService.findNearestStation(
-          position.latitude,
-          position.longitude,
-        );
+      final pos = await LocationService.getCurrentPosition();
+      if (pos != null) {
+        final nearest = LocationService.findNearestStation(pos.latitude, pos.longitude);
         startStationName.value = nearest.name;
-        Get.snackbar(
-          'Nearest Station',
-          'Nearest station to your location: ${nearest.name}',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green.withValues(alpha:0.9),
-          colorText: Colors.white,
-          margin: const EdgeInsets.all(12),
-        );
-      } else {
-        Get.snackbar(
-          'Location Error',
-          'Could not retrieve current location. Check GPS and permissions.',
-          snackPosition: SnackPosition.BOTTOM,
-        );
       }
     } finally {
       isLoadingLocation.value = false;
     }
   }
 
-  Future<void> findNearestStationForDestination(String placeName) async {
-    if (placeName.trim().isEmpty) return;
-
+  Future<void> findNearestStationForDestination(String place) async {
+    if (place.trim().isEmpty) return;
     isSearchingPlace.value = true;
     try {
-      final nearest = await LocationService.findNearestStationToPlace(placeName);
+      final nearest = await LocationService.findNearestStationToPlace(place);
       if (nearest != null) {
         endStationName.value = nearest.name;
-        Get.snackbar(
-          'Destination Station',
-          'Nearest station to "$placeName" is: ${nearest.name}',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green.withValues(alpha:0.9),
-          colorText: Colors.white,
-          margin: const EdgeInsets.all(12),
-        );
-      } else {
-        Get.snackbar(
-          'Place Not Found',
-          'Could not find coordinates for the specified place.',
-          snackPosition: SnackPosition.BOTTOM,
-        );
       }
     } finally {
       isSearchingPlace.value = false;

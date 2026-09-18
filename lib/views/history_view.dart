@@ -20,6 +20,7 @@ class HistoryView extends StatelessWidget {
     final controller = Get.put(HistoryController());
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF7F9FC),
       appBar: AppBar(
         title: Text('trip_history'.tr),
         actions: [
@@ -42,7 +43,7 @@ class HistoryView extends StatelessWidget {
                 );
               }
             },
-          )
+          ),
         ],
       ),
       body: Obx(() {
@@ -59,35 +60,72 @@ class HistoryView extends StatelessWidget {
           );
         }
 
-        return ListView.separated(
-          padding: const EdgeInsets.all(12),
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
           itemCount: controller.historyList.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 8),
           itemBuilder: (context, index) {
             final item = controller.historyList[index];
-            final startName = _getStationName(item.startStation);
-            final endName = _getStationName(item.endStation);
+            final start = _getStationName(item.startStation);
+            final dest = _getStationName(item.endStation);
 
             return Card(
+              margin: const EdgeInsets.only(bottom: 12),
               elevation: 2,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(16),
               ),
-              child: ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: Theme.of(context).primaryColor.withValues(alpha: 0.15),
-                  child: Icon(Icons.train, color: Theme.of(context).primaryColor),
-                ),
-                title: Text(
-                  '$startName → $endName',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                subtitle: Text(
-                  '${'stations'.tr}: ${item.stationCount} | ${'est_time'.tr}: ${item.timeInMinutes} ${'min'.tr} | ${'ticket'.tr}: ${item.price} ${'egp'.tr}',
-                ),
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete_outline, color: Colors.red),
-                  onPressed: () => controller.deleteItem(item.id),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.route,
+                          color: Color(0xFFD32F2F),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            '$start → $dest',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete_outline),
+                          onPressed: () => controller.deleteItem(item.id),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      '${item.stationCount} ${'stations'.tr} • ${item.timeInMinutes} ${'est_time'.tr} • ${item.price} ${'ticket'.tr}',
+                      style: const TextStyle(fontWeight: FontWeight.w500),
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      height: 40,
+                      child: Row(
+                        children: [
+                          Chip(
+                            label: Text(start, style: const TextStyle(fontSize: 12)),
+                            backgroundColor: Colors.grey.shade100,
+                          ),
+                          const SizedBox(width: 6),
+                          const Icon(Icons.arrow_forward, size: 16, color: Colors.grey),
+                          const SizedBox(width: 6),
+                          Chip(
+                            label: Text(dest, style: const TextStyle(fontSize: 12)),
+                            backgroundColor: Colors.grey.shade100,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             );

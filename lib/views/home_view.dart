@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/metro_controller.dart';
-import 'history_view.dart';
+import '../models/station_model.dart';
+import '../services/metro_graph_service.dart';
 import 'widgets/station_picker_sheet.dart';
 
 class HomeView extends StatelessWidget {
@@ -34,6 +35,7 @@ class HomeView extends StatelessWidget {
     const primaryColor = Color(0xFF1B3A57);
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF7F9FC),
       appBar: AppBar(
         title: Row(
           mainAxisSize: MainAxisSize.min,
@@ -43,33 +45,50 @@ class HomeView extends StatelessWidget {
             Text('app_title'.tr),
           ],
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.language_rounded),
-            tooltip: 'Change Language',
-            onPressed: () {
-              if (Get.locale?.languageCode == 'ar') {
-                Get.updateLocale(const Locale('en', 'US'));
-              } else {
-                Get.updateLocale(const Locale('ar', 'EG'));
-              }
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.history_rounded),
-            tooltip: 'trip_history'.tr,
-            onPressed: () => Get.to(() => const HistoryView()),
-          ),
-        ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Card(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               child: Padding(
-                padding: const EdgeInsets.all(14.0),
+                padding: const EdgeInsets.all(14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('passenger_type'.tr, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.grey)),
+                    const SizedBox(height: 8),
+                    Obx(() => Wrap(
+                          spacing: 8,
+                          children: [
+                            ChoiceChip(
+                              label: Text('normal_passenger'.tr),
+                              selected: controller.passengerType.value == PassengerType.normal,
+                              onSelected: (_) => controller.setPassengerType(PassengerType.normal),
+                            ),
+                            ChoiceChip(
+                              label: Text('senior_passenger'.tr),
+                              selected: controller.passengerType.value == PassengerType.senior,
+                              onSelected: (_) => controller.setPassengerType(PassengerType.senior),
+                            ),
+                            ChoiceChip(
+                              label: Text('special_needs'.tr),
+                              selected: controller.passengerType.value == PassengerType.specialNeeds,
+                              onSelected: (_) => controller.setPassengerType(PassengerType.specialNeeds),
+                            ),
+                          ],
+                        )),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Card(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              child: Padding(
+                padding: const EdgeInsets.all(14),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -77,10 +96,7 @@ class HomeView extends StatelessWidget {
                       children: [
                         const Icon(Icons.trip_origin, color: Color(0xFF43A047), size: 20),
                         const SizedBox(width: 8),
-                        Text(
-                          'starting_point'.tr,
-                          style: const TextStyle(fontSize: 13, color: Colors.grey, fontWeight: FontWeight.bold),
-                        ),
+                        Text('starting_point'.tr, style: const TextStyle(fontSize: 13, color: Colors.grey, fontWeight: FontWeight.bold)),
                         const Spacer(),
                         IconButton(
                           visualDensity: VisualDensity.compact,
@@ -91,25 +107,25 @@ class HomeView extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     InkWell(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(12),
                       onTap: () => _openStationPicker(context, isStart: true),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                         decoration: BoxDecoration(
                           color: const Color(0xFFF1F4F9),
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(
                           children: [
                             Expanded(
                               child: Obx(() {
-                                final station = controller.selectedStartStation;
+                                final s = controller.selectedStartStation;
                                 return Text(
-                                  station == null ? 'tap_select_start'.tr : station.localizedName,
+                                  s == null ? 'tap_select_start'.tr : s.localizedName,
                                   style: TextStyle(
                                     fontSize: 15,
-                                    fontWeight: station == null ? FontWeight.normal : FontWeight.bold,
-                                    color: station == null ? Colors.grey.shade600 : primaryColor,
+                                    fontWeight: s == null ? FontWeight.normal : FontWeight.bold,
+                                    color: s == null ? Colors.grey.shade600 : primaryColor,
                                   ),
                                 );
                               }),
@@ -124,16 +140,11 @@ class HomeView extends StatelessWidget {
                       width: double.infinity,
                       child: OutlinedButton.icon(
                         style: OutlinedButton.styleFrom(
-                          side: BorderSide(color: Colors.grey.shade300),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         ),
                         icon: const Icon(Icons.my_location, size: 18, color: primaryColor),
                         label: Obx(() => controller.isLoadingLocation.value
-                            ? const SizedBox(
-                                height: 16,
-                                width: 16,
-                                child: CircularProgressIndicator(strokeWidth: 2),
-                              )
+                            ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2))
                             : Text('use_nearest_me'.tr, style: const TextStyle(color: primaryColor))),
                         onPressed: () => controller.findNearestToCurrentLocation(),
                       ),
@@ -144,8 +155,9 @@ class HomeView extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Card(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               child: Padding(
-                padding: const EdgeInsets.all(14.0),
+                padding: const EdgeInsets.all(14),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -153,33 +165,30 @@ class HomeView extends StatelessWidget {
                       children: [
                         const Icon(Icons.location_on, color: Color(0xFFE53935), size: 20),
                         const SizedBox(width: 8),
-                        Text(
-                          'destination'.tr,
-                          style: const TextStyle(fontSize: 13, color: Colors.grey, fontWeight: FontWeight.bold),
-                        ),
+                        Text('destination'.tr, style: const TextStyle(fontSize: 13, color: Colors.grey, fontWeight: FontWeight.bold)),
                       ],
                     ),
                     const SizedBox(height: 6),
                     InkWell(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(12),
                       onTap: () => _openStationPicker(context, isStart: false),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                         decoration: BoxDecoration(
                           color: const Color(0xFFF1F4F9),
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(
                           children: [
                             Expanded(
                               child: Obx(() {
-                                final station = controller.selectedEndStation;
+                                final s = controller.selectedEndStation;
                                 return Text(
-                                  station == null ? 'tap_select_end'.tr : station.localizedName,
+                                  s == null ? 'tap_select_end'.tr : s.localizedName,
                                   style: TextStyle(
                                     fontSize: 15,
-                                    fontWeight: station == null ? FontWeight.normal : FontWeight.bold,
-                                    color: station == null ? Colors.grey.shade600 : primaryColor,
+                                    fontWeight: s == null ? FontWeight.normal : FontWeight.bold,
+                                    color: s == null ? Colors.grey.shade600 : primaryColor,
                                   ),
                                 );
                               }),
@@ -209,17 +218,9 @@ class HomeView extends StatelessWidget {
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           ),
-                          onPressed: () {
-                            controller.findNearestStationForDestination(
-                              placeSearchController.text,
-                            );
-                          },
+                          onPressed: () => controller.findNearestStationForDestination(placeSearchController.text),
                           child: Obx(() => controller.isSearchingPlace.value
-                              ? const SizedBox(
-                                  height: 16,
-                                  width: 16,
-                                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                                )
+                              ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                               : Text('find'.tr)),
                         ),
                       ],
@@ -247,114 +248,43 @@ class HomeView extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Obx(() {
-              if (!controller.hasCalculated.value) {
+              final fastest = controller.fastestTrip.value;
+              final comfortable = controller.comfortableTrip.value;
+
+              if (fastest == null || comfortable == null) {
                 return const SizedBox.shrink();
               }
 
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Card(
-                    color: const Color(0xFF1B3A57),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          _buildStatItem('stations'.tr, '${controller.stationCount.value}', Icons.train_outlined),
-                          _buildStatItem('est_time'.tr, '${controller.tripTime.value} ${'min'.tr}', Icons.timer_outlined),
-                          _buildStatItem('ticket'.tr, '${controller.ticketPrice.value} ${'egp'.tr}', Icons.confirmation_number_outlined),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  if (controller.instructions.isNotEmpty)
-                    Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(14.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'transit_directions'.tr,
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: primaryColor),
-                            ),
-                            const Divider(height: 16),
-                            ...controller.instructions.map((inst) => Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 4),
-                                  child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      const Icon(Icons.arrow_forward_rounded, size: 18, color: primaryColor),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: Text(
-                                          inst,
-                                          style: const TextStyle(fontSize: 14, height: 1.3),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                )),
-                          ],
+                  Text('route_options'.tr, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: primaryColor)),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildRouteOptionCard(
+                          title: 'fastest_route'.tr,
+                          trip: fastest,
+                          isSelected: controller.selectedRouteIndex.value == 0,
+                          onTap: () => controller.selectRouteOption(0),
+                          primaryColor: primaryColor,
                         ),
                       ),
-                    ),
-                  const SizedBox(height: 12),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-                    child: Text(
-                      'stations_timeline'.tr,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: primaryColor),
-                    ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: _buildRouteOptionCard(
+                          title: 'fewest_transfers'.tr,
+                          trip: comfortable,
+                          isSelected: controller.selectedRouteIndex.value == 1,
+                          onTap: () => controller.selectRouteOption(1),
+                          primaryColor: primaryColor,
+                        ),
+                      ),
+                    ],
                   ),
-                  Container(
-                    height: 280,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.grey.shade200),
-                    ),
-                    child: ListView.builder(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      itemCount: controller.routeStations.length,
-                      itemBuilder: (context, index) {
-                        final station = controller.routeStations[index];
-                        final isFirst = index == 0;
-                        final isLast = index == controller.routeStations.length - 1;
-
-                        Color indicatorColor = Colors.blueGrey.shade300;
-                        if (isFirst) indicatorColor = const Color(0xFF43A047);
-                        if (isLast) indicatorColor = const Color(0xFFE53935);
-
-                        return ListTile(
-                          dense: true,
-                          leading: CircleAvatar(
-                            radius: 13,
-                            backgroundColor: indicatorColor,
-                            child: Text(
-                              '${index + 1}',
-                              style: const TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          title: Text(
-                            station.localizedName,
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: isFirst || isLast ? FontWeight.bold : FontWeight.w500,
-                              color: isFirst || isLast ? primaryColor : Colors.black87,
-                            ),
-                          ),
-                          subtitle: Text(
-                            station.lines.join(' | '),
-                            style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
+                  _buildTimelineCard(controller.activeTrip!, primaryColor),
                 ],
               );
             }),
@@ -364,20 +294,105 @@ class HomeView extends StatelessWidget {
     );
   }
 
-  Widget _buildStatItem(String label, String value, IconData icon) {
-    return Column(
-      children: [
-        Icon(icon, color: Colors.white70, size: 22),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+  Widget _buildRouteOptionCard({
+    required String title,
+    required TripResult trip,
+    required bool isSelected,
+    required VoidCallback onTap,
+    required Color primaryColor,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: isSelected ? primaryColor : Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: isSelected ? primaryColor : Colors.grey.shade300, width: 1.5),
         ),
-        Text(
-          label,
-          style: const TextStyle(color: Colors.white60, fontSize: 11),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 13,
+                color: isSelected ? Colors.white : primaryColor,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '${trip.stationCount} ${'stations'.tr} • ${trip.estimatedTimeMinutes} ${'est_time'.tr}',
+              style: TextStyle(
+                fontSize: 12,
+                color: isSelected ? Colors.white70 : Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              '${trip.transferCount} ${'transfers_count'.tr} • ${trip.ticketPrice} ${'ticket'.tr}',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+                color: isSelected ? Colors.white : Colors.black,
+              ),
+            ),
+          ],
         ),
-      ],
+      ),
+    );
+  }
+
+  Widget _buildTimelineCard(TripResult trip, Color primaryColor) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.route, color: Color(0xFFD32F2F)),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    '${trip.path.first.localizedName} → ${trip.path.last.localizedName}',
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Text(
+              '${trip.stationCount} ${'stations'.tr} • ${trip.estimatedTimeMinutes} ${'est_time'.tr} • ${trip.ticketPrice} ${'ticket'.tr}',
+              style: const TextStyle(fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 48,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: trip.path.length,
+                separatorBuilder: (_, __) => const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 4),
+                  child: Icon(Icons.arrow_forward, size: 16, color: Colors.grey),
+                ),
+                itemBuilder: (context, idx) {
+                  final st = trip.path[idx];
+                  return Chip(
+                    label: Text(st.localizedName, style: const TextStyle(fontSize: 12)),
+                    backgroundColor: Colors.grey.shade100,
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

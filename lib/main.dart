@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'utils/app_translations.dart';
-import 'views/home_view.dart';
+import 'views/main_navigation_view.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,7 +23,7 @@ class CairoMetroApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'Cairo Metro',
       translations: AppTranslations(),
-      locale: const Locale('ar', 'EG'), // عربي افتراضياً أو en حسب الرغبة
+      locale: const Locale('ar', 'EG'),
       fallbackLocale: const Locale('en', 'US'),
       useInheritedMediaQuery: true,
       builder: DevicePreview.appBuilder,
@@ -46,7 +46,7 @@ class CairoMetroApp extends StatelessWidget {
           ),
         ),
       ),
-      home: HomeView(),
+      home: const MainNavigationView(),
     );
   }
 }

@@ -27,9 +27,9 @@ class SettingsView extends StatelessWidget {
                     children: [
                       Icon(Icons.palette_outlined, color: primaryColor),
                       const SizedBox(width: 10),
-                      Text(
+                      const Text(
                         'Appearance',
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
@@ -66,17 +66,25 @@ class SettingsView extends StatelessWidget {
                     ],
                   ),
                   const Divider(height: 24),
-                  RadioListTile<String>(
+                  ListTile(
                     title: Text('arabic'.tr),
-                    value: 'ar',
-                    groupValue: Get.locale?.languageCode ?? 'ar',
-                    onChanged: (val) => Get.updateLocale(const Locale('ar', 'EG')),
+                    trailing: Icon(
+                      Get.locale?.languageCode == 'ar'
+                          ? Icons.radio_button_checked
+                          : Icons.radio_button_unchecked,
+                      color: Get.locale?.languageCode == 'ar' ? primaryColor : Colors.grey,
+                    ),
+                    onTap: () => Get.updateLocale(const Locale('ar', 'EG')),
                   ),
-                  RadioListTile<String>(
+                  ListTile(
                     title: Text('english'.tr),
-                    value: 'en',
-                    groupValue: Get.locale?.languageCode ?? 'ar',
-                    onChanged: (val) => Get.updateLocale(const Locale('en', 'US')),
+                    trailing: Icon(
+                      Get.locale?.languageCode == 'en'
+                          ? Icons.radio_button_checked
+                          : Icons.radio_button_unchecked,
+                      color: Get.locale?.languageCode == 'en' ? primaryColor : Colors.grey,
+                    ),
+                    onTap: () => Get.updateLocale(const Locale('en', 'US')),
                   ),
                 ],
               ),

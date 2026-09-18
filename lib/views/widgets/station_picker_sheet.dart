@@ -158,7 +158,7 @@ class _StationPickerSheetState extends State<StationPickerSheet>
     return ListView.separated(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       itemCount: stations.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 6),
+      separatorBuilder: (_, _) => const SizedBox(height: 6),
       itemBuilder: (context, index) {
         return _buildStationTile(stations[index], lineColor);
       },
@@ -180,7 +180,7 @@ class _StationPickerSheetState extends State<StationPickerSheet>
     return ListView.separated(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       itemCount: results.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 6),
+      separatorBuilder: (_, _) => const SizedBox(height: 6),
       itemBuilder: (context, index) {
         final station = results[index];
         return _buildStationTile(station, _getStationColor(station));

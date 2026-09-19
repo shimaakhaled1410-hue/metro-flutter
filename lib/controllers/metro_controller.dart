@@ -137,10 +137,17 @@ class MetroController extends GetxController {
   }
 
   void openStartStationMap() {
-    if (selectedStartStation != null) {
-      LocationService.openStationOnMap(selectedStartStation!);
-    }
+  if (selectedStartStation != null) {
+    LocationService.openStationOnMap(selectedStartStation!);
+  } else {
+    Get.snackbar(
+      'app_title'.tr,
+      'select_dep_station'.tr,
+      snackPosition: SnackPosition.BOTTOM,
+      duration: const Duration(seconds: 2),
+    );
   }
+}
 
   Future<void> findNearestToCurrentLocation() async {
     isLoadingLocation.value = true;

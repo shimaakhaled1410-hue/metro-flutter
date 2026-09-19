@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:metro/services/metro_graph_service.dart';
 import '../controllers/history_controller.dart';
 import '../data/metro_data.dart';
 
@@ -13,6 +14,44 @@ class HistoryView extends StatelessWidget {
     } catch (_) {
       return name;
     }
+  }
+
+  Widget _buildPassengerBadge(BuildContext context, PassengerType type) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    String label;
+    Color badgeColor;
+
+    switch (type) {
+      case PassengerType.senior:
+        label = 'senior_passenger'.tr;
+        badgeColor = Colors.orange;
+        break;
+      case PassengerType.specialNeeds:
+        label = 'special_needs'.tr;
+        badgeColor = Colors.teal;
+        break;
+      case PassengerType.normal:
+        label = 'normal_passenger'.tr;
+        badgeColor = Colors.blue;
+        break;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: badgeColor.withValues(alpha: isDark ? 0.2 : 0.1),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: badgeColor.withValues(alpha: 0.35)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.bold,
+          color: badgeColor,
+        ),
+      ),
+    );
   }
 
   @override
@@ -79,6 +118,7 @@ class HistoryView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         const Icon(
                           Icons.route,
@@ -94,6 +134,7 @@ class HistoryView extends StatelessWidget {
                             ),
                           ),
                         ),
+                        _buildPassengerBadge(context, item.passengerType),
                         IconButton(
                           icon: const Icon(Icons.delete_outline),
                           onPressed: () => controller.deleteItem(item.id),

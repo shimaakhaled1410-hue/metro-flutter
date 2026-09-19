@@ -106,38 +106,37 @@ class MetroController extends GetxController {
       preferFewerTransfers: true,
     );
   }
+void saveActiveTrip() {
+  final trip = activeTrip;
+  if (trip == null) return;
 
-  void saveActiveTrip() {
-    final trip = activeTrip;
-    if (trip == null) return;
+  final historyItem = TripHistory(
+    id: DateTime.now().millisecondsSinceEpoch.toString(),
+    startStation: startStationName.value,
+    endStation: endStationName.value,
+    stationCount: trip.stationCount,
+    timeInMinutes: trip.estimatedTimeMinutes,
+    price: trip.ticketPrice.toDouble(),
+    timestamp: DateTime.now(),
+    routeStations: trip.path.map((s) => s.name).toList(),
+    passengerType: passengerType.value,
+  );
 
-    final historyItem = TripHistory(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      startStation: startStationName.value,
-      endStation: endStationName.value,
-      stationCount: trip.stationCount,
-      timeInMinutes: trip.estimatedTimeMinutes,
-      price: trip.ticketPrice,
-      timestamp: DateTime.now(),
-      routeStations: trip.path.map((s) => s.name).toList(),
+  HistoryService.saveTrip(historyItem).then((_) {
+    if (Get.isRegistered<HistoryController>()) {
+      Get.find<HistoryController>().loadHistory();
+    }
+    Get.snackbar(
+      'app_title'.tr,
+      'trip_saved_success'.tr,
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: const Color(0xFF1B3A57),
+      colorText: Colors.white,
+      margin: const EdgeInsets.all(16),
+      duration: const Duration(seconds: 2),
     );
-
-    HistoryService.saveTrip(historyItem).then((_) {
-      if (Get.isRegistered<HistoryController>()) {
-        Get.find<HistoryController>().loadHistory();
-      }
-      Get.snackbar(
-        'app_title'.tr,
-        'trip_saved_success'.tr,
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: const Color(0xFF1B3A57),
-        colorText: Colors.white,
-        margin: const EdgeInsets.all(16),
-        duration: const Duration(seconds: 2),
-      );
-    });
-  }
-
+  });
+}
   void openStartStationMap() {
   if (selectedStartStation != null) {
     LocationService.openStationOnMap(selectedStartStation!);

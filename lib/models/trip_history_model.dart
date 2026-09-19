@@ -1,12 +1,15 @@
+import 'package:metro/services/metro_graph_service.dart';
+
 class TripHistory {
   final String id;
   final String startStation;
   final String endStation;
   final int stationCount;
   final int timeInMinutes;
-  final int price;
+  final double price;
   final DateTime timestamp;
   final List<String> routeStations;
+  final PassengerType passengerType;
 
   TripHistory({
     required this.id,
@@ -17,6 +20,7 @@ class TripHistory {
     required this.price,
     required this.timestamp,
     required this.routeStations,
+    this.passengerType = PassengerType.normal,
   });
 
   Map<String, dynamic> toJson() => {
@@ -28,19 +32,29 @@ class TripHistory {
         'price': price,
         'timestamp': timestamp.toIso8601String(),
         'routeStations': routeStations,
+        'passengerType': passengerType.name,
       };
 
-  factory TripHistory.fromJson(Map<String, dynamic> json) => TripHistory(
-        id: json['id'] as String,
-        startStation: json['startStation'] as String,
-        endStation: json['endStation'] as String,
-        stationCount: json['stationCount'] as int,
-        timeInMinutes: json['timeInMinutes'] as int,
-        price: json['price'] as int,
-        timestamp: DateTime.parse(json['timestamp'] as String),
-        routeStations: (json['routeStations'] as List<dynamic>?)
-                ?.map((e) => e.toString())
-                .toList() ??
-            [],
+  factory TripHistory.fromJson(Map<String, dynamic> json) {
+    PassengerType resolvedType = PassengerType.normal;
+    final savedType = json['passengerType'] as String?;
+    if (savedType != null) {
+      resolvedType = PassengerType.values.firstWhere(
+        (e) => e.name == savedType,
+        orElse: () => PassengerType.normal,
       );
+    }
+
+    return TripHistory(
+      id: json['id'] as String,
+      startStation: json['startStation'] as String,
+      endStation: json['endStation'] as String,
+      stationCount: json['stationCount'] as int,
+      timeInMinutes: json['timeInMinutes'] as int,
+      price: (json['price'] as num).toDouble(),
+      timestamp: DateTime.parse(json['timestamp'] as String),
+      routeStations: List<String>.from(json['routeStations'] as List),
+      passengerType: resolvedType,
+    );
+  }
 }

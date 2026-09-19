@@ -41,6 +41,17 @@ class MetroController extends GetxController {
     endStationName.value = name;
   }
 
+  void swapStations() {
+    if (startStationName.value.isEmpty && endStationName.value.isEmpty) return;
+    final temp = startStationName.value;
+    startStationName.value = endStationName.value;
+    endStationName.value = temp;
+
+    if (startStationName.value.isNotEmpty && endStationName.value.isNotEmpty) {
+      calculateTrip();
+    }
+  }
+
   void setPassengerType(PassengerType type) {
     passengerType.value = type;
     if (startStationName.value.isNotEmpty && endStationName.value.isNotEmpty) {

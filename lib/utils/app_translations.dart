@@ -60,6 +60,9 @@ class AppTranslations extends Translations {
       'save_trip': 'Save Route to History',
       'trip_saved_success': 'Route saved to history successfully',
       'same_station_error': 'Start and destination stations cannot be the same',
+      'take_line_towards': 'Board train towards',
+      'interchange_walk': 'Transfer walk (~4 mins)',
+      'swap_stations': 'Swap stations',
     },
     'ar_EG': {
       'app_title': 'مترو القاهرة',
@@ -117,6 +120,9 @@ class AppTranslations extends Translations {
       'save_trip': 'حفظ المسار في السجل',
       'trip_saved_success': 'تم حفظ المسار في السجل بنجاح',
       'same_station_error': 'لا يمكن أن تكون محطة البداية هي نفسها محطة الوصول',
+      'take_line_towards': 'استقل قطار اتجاه',
+      'interchange_walk': 'تبديل رصيف مشياً (~4 دقائق)',
+      'swap_stations': 'تبديل المحطات',
     },
   };
 }

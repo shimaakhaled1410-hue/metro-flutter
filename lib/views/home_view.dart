@@ -62,28 +62,13 @@ class HomeView extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        const Icon(
-                          Icons.trip_origin,
-                          color: Color(0xFF43A047),
-                          size: 20,
-                        ),
+                        const Icon(Icons.trip_origin, color: Color(0xFF43A047), size: 20),
                         const SizedBox(width: 8),
-                        Text(
-                          'starting_point'.tr,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        Text('starting_point'.tr, style: const TextStyle(fontSize: 13, color: Colors.grey, fontWeight: FontWeight.bold)),
                         const Spacer(),
                         IconButton(
                           visualDensity: VisualDensity.compact,
-                          icon: Icon(
-                            Icons.map_outlined,
-                            color: primaryColor,
-                            size: 22,
-                          ),
+                          icon: Icon(Icons.map_outlined, color: primaryColor, size: 22),
                           onPressed: () => controller.openStartStationMap(),
                         ),
                       ],
@@ -93,14 +78,9 @@ class HomeView extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                       onTap: () => _openStationPicker(context, isStart: true),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 12,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                         decoration: BoxDecoration(
-                          color: isDark
-                              ? const Color(0xFF252A36)
-                              : const Color(0xFFF1F4F9),
+                          color: isDark ? const Color(0xFF252A36) : const Color(0xFFF1F4F9),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(
@@ -109,19 +89,11 @@ class HomeView extends StatelessWidget {
                               child: Obx(() {
                                 final s = controller.selectedStartStation;
                                 return Text(
-                                  s == null
-                                      ? 'tap_select_start'.tr
-                                      : s.localizedName,
+                                  s == null ? 'tap_select_start'.tr : s.localizedName,
                                   style: TextStyle(
                                     fontSize: 15,
-                                    fontWeight: s == null
-                                        ? FontWeight.normal
-                                        : FontWeight.bold,
-                                    color: s == null
-                                        ? Colors.grey.shade500
-                                        : (isDark
-                                              ? Colors.white
-                                              : Colors.black87),
+                                    fontWeight: s == null ? FontWeight.normal : FontWeight.bold,
+                                    color: s == null ? Colors.grey.shade500 : (isDark ? Colors.white : Colors.black87),
                                   ),
                                 );
                               }),
@@ -136,38 +108,46 @@ class HomeView extends StatelessWidget {
                       width: double.infinity,
                       child: OutlinedButton.icon(
                         style: OutlinedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         ),
-                        icon: Icon(
-                          Icons.my_location,
-                          size: 18,
-                          color: primaryColor,
-                        ),
-                        label: Obx(
-                          () => controller.isLoadingLocation.value
-                              ? const SizedBox(
-                                  height: 16,
-                                  width: 16,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : Text(
-                                  'use_nearest_me'.tr,
-                                  style: TextStyle(color: primaryColor),
-                                ),
-                        ),
-                        onPressed: () =>
-                            controller.findNearestToCurrentLocation(),
+                        icon: Icon(Icons.my_location, size: 18, color: primaryColor),
+                        label: Obx(() => controller.isLoadingLocation.value
+                            ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                            : Text('use_nearest_me'.tr, style: TextStyle(color: primaryColor))),
+                        onPressed: () => controller.findNearestToCurrentLocation(),
                       ),
                     ),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: InkWell(
+                  onTap: () => controller.swapStations(),
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF1E222B) : Colors.white,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: isDark ? const Color(0xFF2C3240) : Colors.grey.shade300,
+                        width: 1.5,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.05),
+                          blurRadius: 6,
+                        ),
+                      ],
+                    ),
+                    child: Icon(Icons.swap_vert_rounded, color: primaryColor, size: 22),
+                  ),
+                ),
+              ),
+            ),
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(14),
@@ -176,20 +156,9 @@ class HomeView extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        const Icon(
-                          Icons.location_on,
-                          color: Color(0xFFE53935),
-                          size: 20,
-                        ),
+                        const Icon(Icons.location_on, color: Color(0xFFE53935), size: 20),
                         const SizedBox(width: 8),
-                        Text(
-                          'destination'.tr,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        Text('destination'.tr, style: const TextStyle(fontSize: 13, color: Colors.grey, fontWeight: FontWeight.bold)),
                       ],
                     ),
                     const SizedBox(height: 6),
@@ -197,14 +166,9 @@ class HomeView extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                       onTap: () => _openStationPicker(context, isStart: false),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 12,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                         decoration: BoxDecoration(
-                          color: isDark
-                              ? const Color(0xFF252A36)
-                              : const Color(0xFFF1F4F9),
+                          color: isDark ? const Color(0xFF252A36) : const Color(0xFFF1F4F9),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(
@@ -213,19 +177,11 @@ class HomeView extends StatelessWidget {
                               child: Obx(() {
                                 final s = controller.selectedEndStation;
                                 return Text(
-                                  s == null
-                                      ? 'tap_select_end'.tr
-                                      : s.localizedName,
+                                  s == null ? 'tap_select_end'.tr : s.localizedName,
                                   style: TextStyle(
                                     fontSize: 15,
-                                    fontWeight: s == null
-                                        ? FontWeight.normal
-                                        : FontWeight.bold,
-                                    color: s == null
-                                        ? Colors.grey.shade500
-                                        : (isDark
-                                              ? Colors.white
-                                              : Colors.black87),
+                                    fontWeight: s == null ? FontWeight.normal : FontWeight.bold,
+                                    color: s == null ? Colors.grey.shade500 : (isDark ? Colors.white : Colors.black87),
                                   ),
                                 );
                               }),
@@ -244,48 +200,24 @@ class HomeView extends StatelessWidget {
                             style: const TextStyle(fontSize: 14),
                             decoration: InputDecoration(
                               filled: true,
-                              fillColor: isDark
-                                  ? const Color(0xFF252A36)
-                                  : const Color(0xFFF1F4F9),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide.none,
-                              ),
+                              fillColor: isDark ? const Color(0xFF252A36) : const Color(0xFFF1F4F9),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                               hintText: 'going_area_hint'.tr,
-                              prefixIcon: const Icon(
-                                Icons.travel_explore,
-                                size: 18,
-                              ),
+                              prefixIcon: const Icon(Icons.travel_explore, size: 18),
                             ),
                           ),
                         ),
                         const SizedBox(width: 8),
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: isDark
-                                ? const Color(0xFF2A364F)
-                                : primaryColor,
+                            backgroundColor: isDark ? const Color(0xFF2A364F) : primaryColor,
                             foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           ),
-                          onPressed: () =>
-                              controller.findNearestStationForDestination(
-                                placeSearchController.text,
-                              ),
-                          child: Obx(
-                            () => controller.isSearchingPlace.value
-                                ? const SizedBox(
-                                    height: 16,
-                                    width: 16,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: Colors.white,
-                                    ),
-                                  )
-                                : Text('find'.tr),
-                          ),
+                          onPressed: () => controller.findNearestStationForDestination(placeSearchController.text),
+                          child: Obx(() => controller.isSearchingPlace.value
+                              ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                              : Text('find'.tr)),
                         ),
                       ],
                     ),
@@ -296,33 +228,18 @@ class HomeView extends StatelessWidget {
             const SizedBox(height: 16),
             FilledButton(
               style: FilledButton.styleFrom(
-                backgroundColor: isDark
-                    ? const Color(0xFF2A364F)
-                    : primaryColor,
+                backgroundColor: isDark ? const Color(0xFF2A364F) : primaryColor,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               onPressed: () => controller.calculateTrip(),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(
-                    Icons.alt_route_rounded,
-                    size: 20,
-                    color: Colors.white,
-                  ),
+                  const Icon(Icons.alt_route_rounded, size: 20, color: Colors.white),
                   const SizedBox(width: 8),
-                  Text(
-                    'calculate_trip'.tr,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
+                  Text('calculate_trip'.tr, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
                 ],
               ),
             ),
@@ -335,8 +252,7 @@ class HomeView extends StatelessWidget {
                 return const SizedBox.shrink();
               }
 
-              final isSameRoute =
-                  fastest.stationCount == comfortable.stationCount &&
+              final isSameRoute = fastest.stationCount == comfortable.stationCount &&
                   fastest.transferCount == comfortable.transferCount;
 
               return Column(
@@ -344,11 +260,7 @@ class HomeView extends StatelessWidget {
                 children: [
                   Text(
                     isSameRoute ? 'transit_directions'.tr : 'route_options'.tr,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: primaryColor,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: primaryColor),
                   ),
                   const SizedBox(height: 10),
                   if (isSameRoute)
@@ -365,8 +277,7 @@ class HomeView extends StatelessWidget {
                           child: RouteOptionCard(
                             title: 'fastest_route'.tr,
                             trip: fastest,
-                            isSelected:
-                                controller.selectedRouteIndex.value == 0,
+                            isSelected: controller.selectedRouteIndex.value == 0,
                             onTap: () => controller.selectRouteOption(0),
                           ),
                         ),
@@ -375,8 +286,7 @@ class HomeView extends StatelessWidget {
                           child: RouteOptionCard(
                             title: 'fewest_transfers'.tr,
                             trip: comfortable,
-                            isSelected:
-                                controller.selectedRouteIndex.value == 1,
+                            isSelected: controller.selectedRouteIndex.value == 1,
                             onTap: () => controller.selectRouteOption(1),
                           ),
                         ),
@@ -387,21 +297,12 @@ class HomeView extends StatelessWidget {
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       side: BorderSide(color: primaryColor),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
-                    icon: Icon(
-                      Icons.bookmark_add_outlined,
-                      color: primaryColor,
-                    ),
+                    icon: Icon(Icons.bookmark_add_outlined, color: primaryColor),
                     label: Text(
                       'save_trip'.tr,
-                      style: TextStyle(
-                        color: primaryColor,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                      ),
+                      style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold, fontSize: 14),
                     ),
                     onPressed: () => controller.saveActiveTrip(),
                   ),

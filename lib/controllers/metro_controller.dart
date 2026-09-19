@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../data/metro_data.dart';
 import '../models/station_model.dart';
@@ -49,10 +50,6 @@ class MetroController extends GetxController {
 
   void selectRouteOption(int index) {
     selectedRouteIndex.value = index;
-    final trip = activeTrip;
-    if (trip != null) {
-      _persistTrip(trip);
-    }
   }
 
   void calculateTrip() {
@@ -64,6 +61,8 @@ class MetroController extends GetxController {
       );
       return;
     }
+
+    selectedRouteIndex.value = 0;
 
     fastestTrip.value = _graphService.calculateTrip(
       startStationName.value,
@@ -78,29 +77,36 @@ class MetroController extends GetxController {
       passengerType.value,
       preferFewerTransfers: true,
     );
-
-    final tripToSave = activeTrip;
-    if (tripToSave != null) {
-      _persistTrip(tripToSave);
-    }
   }
 
- void _persistTrip(TripResult result) {
-    final trip = TripHistory(
+  void saveActiveTrip() {
+    final trip = activeTrip;
+    if (trip == null) return;
+
+    final historyItem = TripHistory(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       startStation: startStationName.value,
       endStation: endStationName.value,
-      stationCount: result.stationCount,
-      timeInMinutes: result.estimatedTimeMinutes,
-      price: result.ticketPrice,
+      stationCount: trip.stationCount,
+      timeInMinutes: trip.estimatedTimeMinutes,
+      price: trip.ticketPrice,
       timestamp: DateTime.now(),
-      routeStations: result.path.map((s) => s.name).toList(),
+      routeStations: trip.path.map((s) => s.name).toList(),
     );
 
-    HistoryService.saveTrip(trip).then((_) {
+    HistoryService.saveTrip(historyItem).then((_) {
       if (Get.isRegistered<HistoryController>()) {
         Get.find<HistoryController>().loadHistory();
       }
+      Get.snackbar(
+        'app_title'.tr,
+        'trip_saved_success'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: const Color(0xFF1B3A57),
+        colorText: Colors.white,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
+      );
     });
   }
 

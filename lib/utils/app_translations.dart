@@ -57,6 +57,8 @@ class AppTranslations extends Translations {
       'normal_desc': 'Standard public transit fare',
       'senior_desc': '50% discount on all ticket tiers',
       'special_desc': 'Fixed 5 EGP fare across all lines',
+      'save_trip': 'Save Route to History',
+      'trip_saved_success': 'Route saved to history successfully',
     },
     'ar_EG': {
       'app_title': 'مترو القاهرة',
@@ -111,6 +113,8 @@ class AppTranslations extends Translations {
       'normal_desc': 'تسعيرة التذكرة العادية الموحدة',
       'senior_desc': 'خصم 50% على جميع أسعار التذاكر',
       'special_desc': 'سعر موحد 5 جنيهات لجميع الخطوط',
+      'save_trip': 'حفظ المسار في السجل',
+      'trip_saved_success': 'تم حفظ المسار في السجل بنجاح',
     },
   };
 }

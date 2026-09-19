@@ -299,6 +299,7 @@ class HomeView extends StatelessWidget {
                 backgroundColor: isDark
                     ? const Color(0xFF2A364F)
                     : primaryColor,
+                foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -308,7 +309,11 @@ class HomeView extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.alt_route_rounded, size: 20),
+                  const Icon(
+                    Icons.alt_route_rounded,
+                    size: 20,
+                    color: Colors.white,
+                  ),
                   const SizedBox(width: 8),
                   Text(
                     'calculate_trip'.tr,
@@ -321,7 +326,6 @@ class HomeView extends StatelessWidget {
                 ],
               ),
             ),
-            
             const SizedBox(height: 16),
             Obx(() {
               final fastest = controller.fastestTrip.value;

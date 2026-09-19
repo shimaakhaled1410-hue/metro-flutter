@@ -62,6 +62,21 @@ class MetroController extends GetxController {
       return;
     }
 
+    if (startStationName.value == endStationName.value) {
+      fastestTrip.value = null;
+      comfortableTrip.value = null;
+      Get.snackbar(
+        'app_title'.tr,
+        'same_station_error'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.orange.shade800,
+        colorText: Colors.white,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
+      );
+      return;
+    }
+
     selectedRouteIndex.value = 0;
 
     fastestTrip.value = _graphService.calculateTrip(

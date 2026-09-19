@@ -59,6 +59,7 @@ class AppTranslations extends Translations {
       'special_desc': 'Fixed 5 EGP fare across all lines',
       'save_trip': 'Save Route to History',
       'trip_saved_success': 'Route saved to history successfully',
+      'same_station_error': 'Start and destination stations cannot be the same',
     },
     'ar_EG': {
       'app_title': 'مترو القاهرة',
@@ -115,6 +116,7 @@ class AppTranslations extends Translations {
       'special_desc': 'سعر موحد 5 جنيهات لجميع الخطوط',
       'save_trip': 'حفظ المسار في السجل',
       'trip_saved_success': 'تم حفظ المسار في السجل بنجاح',
+      'same_station_error': 'لا يمكن أن تكون محطة البداية هي نفسها محطة الوصول',
     },
   };
 }

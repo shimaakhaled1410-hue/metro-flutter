@@ -56,9 +56,9 @@ class MetroGraphService {
 
     int normalPrice;
     if (stationCount <= 9) {
-      normalPrice = 8;
-    } else if (stationCount <= 16) {
       normalPrice = 10;
+    } else if (stationCount <= 16) {
+      normalPrice = 12;
     } else if (stationCount <= 23) {
       normalPrice = 15;
     } else {

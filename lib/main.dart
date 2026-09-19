@@ -24,11 +24,11 @@ class CairoMetroApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'Cairo Metro',
       translations: AppTranslations(),
-      locale: const Locale('ar', 'EG'),
+      locale: const Locale('en', 'US'),
       fallbackLocale: const Locale('en', 'US'),
       theme: AppThemes.lightTheme,
       darkTheme: AppThemes.darkTheme,
-      themeMode: ThemeMode.system,
+      themeMode: ThemeMode.light,
       useInheritedMediaQuery: true,
       builder: DevicePreview.appBuilder,
       debugShowCheckedModeBanner: false,

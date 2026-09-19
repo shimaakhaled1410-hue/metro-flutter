@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:metro/views/metro_map_view.dart';
+import 'package:metro/views/widgets/landmarks_dialog.dart';
 import '../controllers/metro_controller.dart';
 import 'widgets/passenger_badge_card.dart';
 import 'widgets/route_option_card.dart';
@@ -10,7 +11,7 @@ import 'widgets/vertical_timeline.dart';
 class HomeView extends StatelessWidget {
   HomeView({super.key});
 
-  final MetroController controller = Get.put(MetroController());
+  final MetroController controller = Get.find<MetroController>();
   final TextEditingController placeSearchController = TextEditingController();
 
   void _openStationPicker(BuildContext context, {required bool isStart}) {
@@ -280,9 +281,31 @@ class HomeView extends StatelessWidget {
                     const SizedBox(height: 12),
                     Row(
                       children: [
+                        IconButton.filledTonal(
+                          style: IconButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: const EdgeInsets.all(12),
+                          ),
+                          icon: const Icon(Icons.explore_rounded, size: 22),
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (_) => LandmarksDialog(
+                                onSelect: (stationName) {
+                                  controller.selectEndStation(stationName);
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(width: 8),
                         Expanded(
                           child: TextField(
                             controller: placeSearchController,
+                            onChanged: (val) =>
+                                controller.searchPlaceText.value = val.trim(),
                             style: const TextStyle(fontSize: 14),
                             decoration: InputDecoration(
                               filled: true,
@@ -302,33 +325,50 @@ class HomeView extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: isDark
-                                ? const Color(0xFF2A364F)
-                                : primaryColor,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          onPressed: () =>
-                              controller.findNearestStationForDestination(
-                                placeSearchController.text,
+                        Obx(() {
+                          final bool hasText =
+                              controller.searchPlaceText.value.isNotEmpty;
+                          return ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: hasText
+                                  ? (isDark
+                                        ? const Color(0xFF3B82F6)
+                                        : primaryColor)
+                                  : (isDark
+                                        ? const Color(0xFF232936)
+                                        : Colors.grey.shade300),
+                              foregroundColor: hasText
+                                  ? Colors.white
+                                  : (isDark
+                                        ? Colors.white38
+                                        : Colors.grey.shade600),
+                              elevation: hasText ? 2 : 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
                               ),
-                          child: Obx(
-                            () => controller.isSearchingPlace.value
-                                ? const SizedBox(
-                                    height: 16,
-                                    width: 16,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: Colors.white,
-                                    ),
-                                  )
-                                : Text('find'.tr),
-                          ),
-                        ),
+                            ),
+                            onPressed: hasText
+                                ? () {
+                                    FocusScope.of(context).unfocus();
+                                    controller.findNearestStationForDestination(
+                                      placeSearchController.text,
+                                    );
+                                  }
+                                : null,
+                            child: Obx(
+                              () => controller.isSearchingPlace.value
+                                  ? const SizedBox(
+                                      height: 16,
+                                      width: 16,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : Text('find'.tr),
+                            ),
+                          );
+                        }),
                       ],
                     ),
                   ],

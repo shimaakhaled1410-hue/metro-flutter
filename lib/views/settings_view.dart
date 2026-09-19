@@ -11,9 +11,7 @@ class SettingsView extends StatelessWidget {
     final primaryColor = Theme.of(context).colorScheme.primary;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('settings_title'.tr),
-      ),
+      appBar: AppBar(title: Text('settings_title'.tr)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -27,20 +25,25 @@ class SettingsView extends StatelessWidget {
                     children: [
                       Icon(Icons.palette_outlined, color: primaryColor),
                       const SizedBox(width: 10),
-                      const Text(
-                        'Appearance',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      Text(
+                        'appearance'.tr,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),
                   const Divider(height: 24),
                   Obx(
                     () => SwitchListTile(
-                      title: const Text('Dark Mode'),
+                      title: Text('dark_mode'.tr),
                       value: themeController.isDarkMode.value,
                       onChanged: (_) => themeController.toggleTheme(),
                       secondary: Icon(
-                        themeController.isDarkMode.value ? Icons.dark_mode : Icons.light_mode,
+                        themeController.isDarkMode.value
+                            ? Icons.dark_mode
+                            : Icons.light_mode,
                       ),
                     ),
                   ),
@@ -61,7 +64,10 @@ class SettingsView extends StatelessWidget {
                       const SizedBox(width: 10),
                       Text(
                         'language_title'.tr,
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),
@@ -72,7 +78,9 @@ class SettingsView extends StatelessWidget {
                       Get.locale?.languageCode == 'ar'
                           ? Icons.radio_button_checked
                           : Icons.radio_button_unchecked,
-                      color: Get.locale?.languageCode == 'ar' ? primaryColor : Colors.grey,
+                      color: Get.locale?.languageCode == 'ar'
+                          ? primaryColor
+                          : Colors.grey,
                     ),
                     onTap: () => Get.updateLocale(const Locale('ar', 'EG')),
                   ),
@@ -82,7 +90,9 @@ class SettingsView extends StatelessWidget {
                       Get.locale?.languageCode == 'en'
                           ? Icons.radio_button_checked
                           : Icons.radio_button_unchecked,
-                      color: Get.locale?.languageCode == 'en' ? primaryColor : Colors.grey,
+                      color: Get.locale?.languageCode == 'en'
+                          ? primaryColor
+                          : Colors.grey,
                     ),
                     onTap: () => Get.updateLocale(const Locale('en', 'US')),
                   ),

@@ -64,6 +64,8 @@ class AppTranslations extends Translations {
       'interchange_walk': 'Transfer walk (~4 mins)',
       'swap_stations': 'Swap stations',
       'metro_map': 'Metro Map',
+      'appearance': 'Appearance',
+      'dark_mode': 'Dark Mode',
     },
     'ar_EG': {
       'app_title': 'مترو القاهرة',
@@ -125,6 +127,8 @@ class AppTranslations extends Translations {
       'interchange_walk': 'تبديل رصيف مشياً (~4 دقائق)',
       'swap_stations': 'تبديل المحطات',
       'metro_map': 'خريطة المترو',
+      'appearance': 'المظهر',
+      'dark_mode': 'الوضع الداكن',
     },
   };
 }

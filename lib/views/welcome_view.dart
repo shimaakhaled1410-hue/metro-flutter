@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:metro/services/metro_graph_service.dart';
 import '../controllers/metro_controller.dart';
-import '../services/metro_graph_service.dart';
 import 'main_navigation_view.dart';
 
 class WelcomeView extends StatelessWidget {
@@ -9,7 +9,7 @@ class WelcomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final MetroController controller = Get.put(MetroController());
+    final MetroController controller = Get.find<MetroController>();
     final primaryColor = Theme.of(context).colorScheme.primary;
 
     return Scaffold(
@@ -105,7 +105,13 @@ class WelcomeView extends StatelessWidget {
                     borderRadius: BorderRadius.circular(14),
                   ),
                 ),
-                onPressed: () => Get.off(() => const MainNavigationView()),
+                onPressed: () {
+                  Get.offAll(
+                    () => const MainNavigationView(),
+                    transition: Transition.fadeIn,
+                    duration: const Duration(milliseconds: 200),
+                  );
+                },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

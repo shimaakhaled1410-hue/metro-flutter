@@ -44,8 +44,23 @@ class MetroGraphService {
   }
 
   Station? getStationByName(String name) {
+    final cleanSearch = name
+        .trim()
+        .toLowerCase()
+        .replaceAll('-', ' ')
+        .replaceAll('el ', '')
+        .replaceAll('al ', '');
     try {
-      return MetroData.allStations.firstWhere((s) => s.name == name);
+      return MetroData.allStations.firstWhere((s) {
+        final cleanStation = s.name
+            .trim()
+            .toLowerCase()
+            .replaceAll('-', ' ')
+            .replaceAll('el ', '')
+            .replaceAll('al ', '');
+        return cleanStation == cleanSearch ||
+            s.name.toLowerCase() == name.trim().toLowerCase();
+      });
     } catch (_) {
       return null;
     }
@@ -78,7 +93,9 @@ class MetroGraphService {
 
     for (int i = 1; i < path.length - 1; i++) {
       String nextLine = _getCommonLine(path[i], path[i + 1]);
-      if (currentLine != nextLine && nextLine.isNotEmpty && currentLine.isNotEmpty) {
+      if (currentLine != nextLine &&
+          nextLine.isNotEmpty &&
+          currentLine.isNotEmpty) {
         transfers++;
         currentLine = nextLine;
       }
@@ -111,7 +128,12 @@ class MetroGraphService {
     return steps;
   }
 
-  TripResult? calculateTrip(String start, String end, PassengerType passengerType, {bool preferFewerTransfers = false}) {
+  TripResult? calculateTrip(
+    String start,
+    String end,
+    PassengerType passengerType, {
+    bool preferFewerTransfers = false,
+  }) {
     if (start == end) {
       final s = getStationByName(start);
       if (s == null) return null;
@@ -162,7 +184,9 @@ class MetroGraphService {
     }
 
     final chosenPathNames = allPaths.first;
-    final path = chosenPathNames.map((name) => getStationByName(name)!).toList();
+    final path = chosenPathNames
+        .map((name) => getStationByName(name)!)
+        .toList();
     final stationCount = path.length;
     final transfers = countTransfers(chosenPathNames);
     final time = (stationCount * 2) + (transfers * 5);

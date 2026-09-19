@@ -22,6 +22,8 @@ class MetroController extends GetxController {
   var isLoadingLocation = false.obs;
   var isSearchingPlace = false.obs;
 
+  var searchPlaceText = ''.obs;
+
   List<Station> get allStations => MetroData.allStations;
 
   Station? get selectedStartStation =>

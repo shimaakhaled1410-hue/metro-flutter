@@ -23,6 +23,7 @@ class MetroController extends GetxController {
   var isSearchingPlace = false.obs;
 
   var searchPlaceText = ''.obs;
+  final RxnString selectedDestinationTag = RxnString();
 
   List<Station> get allStations => MetroData.allStations;
 
@@ -39,8 +40,9 @@ class MetroController extends GetxController {
     startStationName.value = name;
   }
 
-  void selectEndStation(String name) {
+  void selectEndStation(String name, {String? tag}) {
     endStationName.value = name;
+    selectedDestinationTag.value = tag;
   }
 
   void swapStations() {
@@ -48,6 +50,7 @@ class MetroController extends GetxController {
     final temp = startStationName.value;
     startStationName.value = endStationName.value;
     endStationName.value = temp;
+    selectedDestinationTag.value = null;
 
     if (startStationName.value.isNotEmpty && endStationName.value.isNotEmpty) {
       calculateTrip();
@@ -106,49 +109,52 @@ class MetroController extends GetxController {
       preferFewerTransfers: true,
     );
   }
-void saveActiveTrip() {
-  final trip = activeTrip;
-  if (trip == null) return;
 
-  final historyItem = TripHistory(
-    id: DateTime.now().millisecondsSinceEpoch.toString(),
-    startStation: startStationName.value,
-    endStation: endStationName.value,
-    stationCount: trip.stationCount,
-    timeInMinutes: trip.estimatedTimeMinutes,
-    price: trip.ticketPrice.toDouble(),
-    timestamp: DateTime.now(),
-    routeStations: trip.path.map((s) => s.name).toList(),
-    passengerType: passengerType.value,
-  );
+  void saveActiveTrip() {
+    final trip = activeTrip;
+    if (trip == null) return;
 
-  HistoryService.saveTrip(historyItem).then((_) {
-    if (Get.isRegistered<HistoryController>()) {
-      Get.find<HistoryController>().loadHistory();
-    }
-    Get.snackbar(
-      'app_title'.tr,
-      'trip_saved_success'.tr,
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: const Color(0xFF1B3A57),
-      colorText: Colors.white,
-      margin: const EdgeInsets.all(16),
-      duration: const Duration(seconds: 2),
+    final historyItem = TripHistory(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      startStation: startStationName.value,
+      endStation: endStationName.value,
+      stationCount: trip.stationCount,
+      timeInMinutes: trip.estimatedTimeMinutes,
+      price: trip.ticketPrice.toDouble(),
+      timestamp: DateTime.now(),
+      routeStations: trip.path.map((s) => s.name).toList(),
+      passengerType: passengerType.value,
+      destinationTag: selectedDestinationTag.value,
     );
-  });
-}
-  void openStartStationMap() {
-  if (selectedStartStation != null) {
-    LocationService.openStationOnMap(selectedStartStation!);
-  } else {
-    Get.snackbar(
-      'app_title'.tr,
-      'select_dep_station'.tr,
-      snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 2),
-    );
+
+    HistoryService.saveTrip(historyItem).then((_) {
+      if (Get.isRegistered<HistoryController>()) {
+        Get.find<HistoryController>().loadHistory();
+      }
+      Get.snackbar(
+        'app_title'.tr,
+        'trip_saved_success'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: const Color(0xFF1B3A57),
+        colorText: Colors.white,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
+      );
+    });
   }
-}
+
+  void openStartStationMap() {
+    if (selectedStartStation != null) {
+      LocationService.openStationOnMap(selectedStartStation!);
+    } else {
+      Get.snackbar(
+        'app_title'.tr,
+        'select_dep_station'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 2),
+      );
+    }
+  }
 
   Future<void> findNearestToCurrentLocation() async {
     isLoadingLocation.value = true;
@@ -164,13 +170,25 @@ void saveActiveTrip() {
   }
 
   Future<void> findNearestStationForDestination(String place) async {
-    if (place.trim().isEmpty) return;
+    final trimmedPlace = place.trim();
+    if (trimmedPlace.isEmpty) return;
     isSearchingPlace.value = true;
     try {
-      final nearest = await LocationService.findNearestStationToPlace(place);
+      final nearest = await LocationService.findNearestStationToPlace(trimmedPlace);
       if (nearest != null) {
-        endStationName.value = nearest.name;
+        selectEndStation(nearest.name, tag: trimmedPlace);
       }
+    } catch (_) {
+      Get.snackbar(
+        'no_internet_search_title'.tr,
+        'no_internet_search_desc'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+        icon: const Icon(Icons.wifi_off_rounded, color: Colors.white),
+        backgroundColor: const Color(0xFFD32F2F),
+        colorText: Colors.white,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 3),
+      );
     } finally {
       isSearchingPlace.value = false;
     }

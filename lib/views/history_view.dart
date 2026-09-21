@@ -105,10 +105,14 @@ class HistoryView extends StatelessWidget {
           itemBuilder: (context, index) {
             final item = controller.historyList[index];
             final start = _getStationName(item.startStation);
-            final dest = _getStationName(item.endStation);
+            final destName = _getStationName(item.endStation);
+            final dest = (item.destinationTag != null && item.destinationTag!.isNotEmpty)
+                ? '$destName (${item.destinationTag})'
+                : destName;
+
             final routeList = item.routeStations.isNotEmpty
                 ? item.routeStations.map((e) => _getStationName(e)).toList()
-                : [start, dest];
+                : [start, destName];
 
             return Card(
               margin: const EdgeInsets.only(bottom: 14),

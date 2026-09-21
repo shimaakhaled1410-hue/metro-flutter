@@ -10,6 +10,7 @@ class TripHistory {
   final DateTime timestamp;
   final List<String> routeStations;
   final PassengerType passengerType;
+  final String? destinationTag;
 
   TripHistory({
     required this.id,
@@ -21,6 +22,7 @@ class TripHistory {
     required this.timestamp,
     required this.routeStations,
     this.passengerType = PassengerType.normal,
+    this.destinationTag,
   });
 
   Map<String, dynamic> toJson() => {
@@ -33,6 +35,7 @@ class TripHistory {
         'timestamp': timestamp.toIso8601String(),
         'routeStations': routeStations,
         'passengerType': passengerType.name,
+        'destinationTag': destinationTag,
       };
 
   factory TripHistory.fromJson(Map<String, dynamic> json) {
@@ -55,6 +58,7 @@ class TripHistory {
       timestamp: DateTime.parse(json['timestamp'] as String),
       routeStations: List<String>.from(json['routeStations'] as List),
       passengerType: resolvedType,
+      destinationTag: json['destinationTag'] as String?,
     );
   }
 }

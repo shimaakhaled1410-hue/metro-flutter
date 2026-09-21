@@ -108,6 +108,15 @@ class MetroController extends GetxController {
       passengerType.value,
       preferFewerTransfers: true,
     );
+
+    if (fastestTrip.value != null && comfortableTrip.value != null) {
+      final minFare = fastestTrip.value!.ticketPrice < comfortableTrip.value!.ticketPrice
+          ? fastestTrip.value!.ticketPrice
+          : comfortableTrip.value!.ticketPrice;
+
+      fastestTrip.value = fastestTrip.value!.copyWith(ticketPrice: minFare);
+      comfortableTrip.value = comfortableTrip.value!.copyWith(ticketPrice: minFare);
+    }
   }
 
   void saveActiveTrip() {

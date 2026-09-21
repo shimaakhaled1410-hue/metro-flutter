@@ -22,9 +22,13 @@ class VerticalTimeline extends StatelessWidget {
       lineList = MetroData.line2Names;
     } else {
       if (MetroData.line3BranchA.contains(next.name)) {
-        return MetroData.allStations.firstWhere((s) => s.name == MetroData.line3BranchA.last).localizedName;
+        return MetroData.allStations
+            .firstWhere((s) => s.name == MetroData.line3BranchA.last)
+            .localizedName;
       } else if (MetroData.line3BranchB.contains(next.name)) {
-        return MetroData.allStations.firstWhere((s) => s.name == MetroData.line3BranchB.last).localizedName;
+        return MetroData.allStations
+            .firstWhere((s) => s.name == MetroData.line3BranchB.last)
+            .localizedName;
       }
       lineList = MetroData.line3Common;
     }
@@ -35,7 +39,9 @@ class VerticalTimeline extends StatelessWidget {
     if (currIdx != -1 && nextIdx != -1) {
       final targetName = nextIdx > currIdx ? lineList.last : lineList.first;
       try {
-        return MetroData.allStations.firstWhere((s) => s.name == targetName).localizedName;
+        return MetroData.allStations
+            .firstWhere((s) => s.name == targetName)
+            .localizedName;
       } catch (_) {
         return targetName;
       }
@@ -74,9 +80,17 @@ class VerticalTimeline extends StatelessWidget {
 
                 String? transferLine;
                 if (!isFirst && !isLast) {
-                  final prevLine = _getCommonLine(trip.path[index - 1], station);
-                  final nextLine = _getCommonLine(station, trip.path[index + 1]);
-                  if (prevLine != nextLine && nextLine.isNotEmpty && prevLine.isNotEmpty) {
+                  final prevLine = _getCommonLine(
+                    trip.path[index - 1],
+                    station,
+                  );
+                  final nextLine = _getCommonLine(
+                    station,
+                    trip.path[index + 1],
+                  );
+                  if (prevLine != nextLine &&
+                      nextLine.isNotEmpty &&
+                      prevLine.isNotEmpty) {
                     transferLine = nextLine;
                   }
                 }
@@ -88,8 +102,13 @@ class VerticalTimeline extends StatelessWidget {
                   if (dir.isNotEmpty) {
                     directionInfo = '${'take_line_towards'.tr} $dir';
                   }
-                } else if (transferLine != null && index + 1 < trip.path.length) {
-                  final dir = _getTrainDirection(transferLine, station, trip.path[index + 1]);
+                } else if (transferLine != null &&
+                    index + 1 < trip.path.length) {
+                  final dir = _getTrainDirection(
+                    transferLine,
+                    station,
+                    trip.path[index + 1],
+                  );
                   if (dir.isNotEmpty) {
                     directionInfo = '${'take_line_towards'.tr} $dir';
                   }
@@ -110,13 +129,19 @@ class VerticalTimeline extends StatelessWidget {
                               Positioned(
                                 top: 14,
                                 bottom: 0,
-                                child: Container(width: 3, color: timelineColor.withValues(alpha: 0.6)),
+                                child: Container(
+                                  width: 3,
+                                  color: timelineColor.withValues(alpha: 0.6),
+                                ),
                               ),
                             if (!isFirst)
                               Positioned(
                                 top: 0,
                                 bottom: 14,
-                                child: Container(width: 3, color: timelineColor.withValues(alpha: 0.6)),
+                                child: Container(
+                                  width: 3,
+                                  color: timelineColor.withValues(alpha: 0.6),
+                                ),
                               ),
                             Container(
                               width: isInterchange ? 18 : 14,
@@ -126,15 +151,23 @@ class VerticalTimeline extends StatelessWidget {
                                 color: isInterchange
                                     ? Colors.amber.shade700
                                     : ((isFirst || isLast)
-                                        ? timelineColor
-                                        : (isDark ? const Color(0xFF1E222B) : Colors.white)),
+                                          ? timelineColor
+                                          : (isDark
+                                                ? const Color(0xFF1E222B)
+                                                : Colors.white)),
                                 border: Border.all(
-                                  color: isInterchange ? Colors.amber.shade300 : timelineColor,
+                                  color: isInterchange
+                                      ? Colors.amber.shade300
+                                      : timelineColor,
                                   width: isInterchange ? 2 : 3,
                                 ),
                               ),
                               child: isInterchange
-                                  ? const Icon(Icons.sync_alt, size: 10, color: Colors.white)
+                                  ? const Icon(
+                                      Icons.sync_alt,
+                                      size: 10,
+                                      color: Colors.white,
+                                    )
                                   : null,
                             ),
                           ],
@@ -153,9 +186,12 @@ class VerticalTimeline extends StatelessWidget {
                                     child: Text(
                                       station.localizedName,
                                       style: TextStyle(
-                                        color: isDark ? Colors.white : Colors.black87,
+                                        color: isDark
+                                            ? Colors.white
+                                            : Colors.black87,
                                         fontSize: 15,
-                                        fontWeight: (isFirst || isLast || isInterchange)
+                                        fontWeight:
+                                            (isFirst || isLast || isInterchange)
                                             ? FontWeight.bold
                                             : FontWeight.w600,
                                       ),
@@ -163,21 +199,43 @@ class VerticalTimeline extends StatelessWidget {
                                   ),
                                   if (isFirst)
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 3,
+                                      ),
                                       decoration: BoxDecoration(
-                                        color: isDark ? const Color(0xFF2C3240) : Colors.grey.shade200,
+                                        color: isDark
+                                            ? const Color(0xFF2C3240)
+                                            : Colors.grey.shade200,
                                         borderRadius: BorderRadius.circular(12),
                                       ),
-                                      child: const Text('Start', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                                      child: Text(
+                                        'Start'.tr,
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                     ),
                                   if (isLast)
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 3,
+                                      ),
                                       decoration: BoxDecoration(
-                                        color: isDark ? const Color(0xFF2C3240) : Colors.grey.shade200,
+                                        color: isDark
+                                            ? const Color(0xFF2C3240)
+                                            : Colors.grey.shade200,
                                         borderRadius: BorderRadius.circular(12),
                                       ),
-                                      child: const Text('End', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                                      child: Text(
+                                        'End'.tr,
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                     ),
                                 ],
                               ),
@@ -188,7 +246,10 @@ class VerticalTimeline extends StatelessWidget {
                                   runSpacing: 4,
                                   children: [
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 3,
+                                      ),
                                       decoration: BoxDecoration(
                                         color: timelineColor,
                                         borderRadius: BorderRadius.circular(10),
@@ -196,30 +257,53 @@ class VerticalTimeline extends StatelessWidget {
                                       child: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          const Icon(Icons.transfer_within_a_station, color: Colors.white, size: 13),
+                                          const Icon(
+                                            Icons.transfer_within_a_station,
+                                            color: Colors.white,
+                                            size: 13,
+                                          ),
                                           const SizedBox(width: 4),
                                           Text(
                                             '${'transfer'.tr} $transferLine',
-                                            style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
                                         ],
                                       ),
                                     ),
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 3,
+                                      ),
                                       decoration: BoxDecoration(
-                                        color: isDark ? Colors.orange.shade900.withValues(alpha: 0.35) : Colors.orange.shade100,
+                                        color: isDark
+                                            ? Colors.orange.shade900.withValues(
+                                                alpha: 0.35,
+                                              )
+                                            : Colors.orange.shade100,
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                       child: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          Icon(Icons.directions_walk, size: 13, color: isDark ? Colors.orange.shade200 : Colors.orange.shade900),
+                                          Icon(
+                                            Icons.directions_walk,
+                                            size: 13,
+                                            color: isDark
+                                                ? Colors.orange.shade200
+                                                : Colors.orange.shade900,
+                                          ),
                                           const SizedBox(width: 4),
                                           Text(
                                             'interchange_walk'.tr,
                                             style: TextStyle(
-                                              color: isDark ? Colors.orange.shade200 : Colors.orange.shade900,
+                                              color: isDark
+                                                  ? Colors.orange.shade200
+                                                  : Colors.orange.shade900,
                                               fontSize: 11,
                                               fontWeight: FontWeight.bold,
                                             ),
@@ -234,7 +318,13 @@ class VerticalTimeline extends StatelessWidget {
                                 const SizedBox(height: 5),
                                 Row(
                                   children: [
-                                    Icon(Icons.navigation_outlined, size: 14, color: Theme.of(context).colorScheme.primary),
+                                    Icon(
+                                      Icons.navigation_outlined,
+                                      size: 14,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.primary,
+                                    ),
                                     const SizedBox(width: 4),
                                     Flexible(
                                       child: Text(
@@ -242,7 +332,9 @@ class VerticalTimeline extends StatelessWidget {
                                         style: TextStyle(
                                           fontSize: 12,
                                           fontWeight: FontWeight.w600,
-                                          color: Theme.of(context).colorScheme.primary,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.primary,
                                         ),
                                       ),
                                     ),

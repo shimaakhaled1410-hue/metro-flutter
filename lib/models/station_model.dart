@@ -46,4 +46,22 @@ class TripResult {
     required this.instructions,
     required this.transferCount,
   });
+
+  TripResult copyWith({
+    List<Station>? path,
+    int? stationCount,
+    int? estimatedTimeMinutes,
+    int? ticketPrice,
+    List<String>? instructions,
+    int? transferCount,
+  }) {
+    return TripResult(
+      path: path ?? this.path,
+      stationCount: stationCount ?? this.stationCount,
+      estimatedTimeMinutes: estimatedTimeMinutes ?? this.estimatedTimeMinutes,
+      ticketPrice: ticketPrice ?? this.ticketPrice,
+      instructions: instructions ?? this.instructions,
+      transferCount: transferCount ?? this.transferCount,
+    );
+  }
 }

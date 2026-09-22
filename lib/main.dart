@@ -2,12 +2,12 @@ import 'package:device_preview/device_preview.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:metro/views/splash_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'controllers/theme_controller.dart';
 import 'controllers/metro_controller.dart';
 import 'utils/app_themes.dart';
 import 'utils/app_translations.dart';
-import 'views/welcome_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,7 +44,7 @@ class CairoMetroApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       useInheritedMediaQuery: true,
-      locale: DevicePreview.locale(context) ?? initialLocale,
+      locale: initialLocale,
       builder: DevicePreview.appBuilder,
       debugShowCheckedModeBanner: false,
       title: 'Cairo Metro',
@@ -55,7 +55,7 @@ class CairoMetroApp extends StatelessWidget {
       themeMode: initialThemeMode,
       defaultTransition: Transition.fadeIn,
       transitionDuration: const Duration(milliseconds: 250),
-      home: const WelcomeView(),
+      home: const SplashView(),
     );
   }
 }

@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../controllers/theme_controller.dart';
 
 class SettingsView extends StatelessWidget {
   const SettingsView({super.key});
+
+  Future<void> _changeLanguage(String langCode, String countryCode) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('languageCode', langCode);
+    Get.updateLocale(Locale(langCode, countryCode));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +89,7 @@ class SettingsView extends StatelessWidget {
                           ? primaryColor
                           : Colors.grey,
                     ),
-                    onTap: () => Get.updateLocale(const Locale('ar', 'EG')),
+                    onTap: () => _changeLanguage('ar', 'EG'),
                   ),
                   ListTile(
                     title: Text('english'.tr),
@@ -94,7 +101,7 @@ class SettingsView extends StatelessWidget {
                           ? primaryColor
                           : Colors.grey,
                     ),
-                    onTap: () => Get.updateLocale(const Locale('en', 'US')),
+                    onTap: () => _changeLanguage('en', 'US'),
                   ),
                 ],
               ),

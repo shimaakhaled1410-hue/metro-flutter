@@ -67,6 +67,8 @@ class AppTranslations extends Translations {
       'appearance': 'Appearance',
       'dark_mode': 'Dark Mode',
       'start':'Start',
+      'metro_title': 'Cairo Metro',
+'your_metro_guide': 'Your smart offline guide to Cairo Metro',
     },
     'ar_EG': {
       'app_title': 'مترو القاهرة',
@@ -131,6 +133,8 @@ class AppTranslations extends Translations {
       'appearance': 'المظهر',
       'dark_mode': 'الوضع الداكن',
       'start':'البداية',
+      'metro_title': 'مترو القاهرة',
+'your_metro_guide': 'دليلك الذكي لرحلات مترو القاهرة بدون إنترنت',
     },
   };
 }

@@ -237,26 +237,35 @@ class MetroGraphService {
 
   int calculateTotalTripFare(List<Station> path, PassengerType passengerType) {
     if (path.isEmpty) return 0;
+    if (path.length == 1) return 0;
 
-    int metroCount = 0;
-    int monorailCount = 0;
+    int metroMovements = 0;
+    int monorailMovements = 0;
 
-    for (var station in path) {
-      if (station.lines.contains("Monorail East")) {
-        monorailCount++;
-      } else {
-        metroCount++;
+    for (int i = 0; i < path.length - 1; i++) {
+      final current = path[i];
+      final next = path[i + 1];
+
+      if (current.lines.contains("Monorail East") &&
+          next.lines.contains("Monorail East")) {
+        monorailMovements++;
+      } else if (!current.lines.contains("Monorail East") &&
+          !next.lines.contains("Monorail East")) {
+        metroMovements++;
       }
     }
 
     int metroPrice = 0;
-    if (metroCount > 0) {
-      metroPrice = calculateTicketPrice(metroCount, passengerType);
+    if (metroMovements > 0) {
+      metroPrice = calculateTicketPrice(metroMovements + 1, passengerType);
     }
 
     int monorailPrice = 0;
-    if (monorailCount > 0) {
-      monorailPrice = calculateMonorailPrice(monorailCount, passengerType);
+    if (monorailMovements > 0) {
+      monorailPrice = calculateMonorailPrice(
+        monorailMovements + 1,
+        passengerType,
+      );
     }
 
     return metroPrice + monorailPrice;

@@ -79,7 +79,18 @@ class RouteOptionCard extends StatelessWidget {
 
                 String priceDisplay = '${trip.ticketPrice} ${'ticket'.tr}';
 
-                if (metroCount > 0 && monorailCount > 0) {
+                int monorailRides = 0;
+                for (int i = 0; i < trip.path.length - 1; i++) {
+                  if (trip.path[i].lines.contains("Monorail East") &&
+                      trip.path[i + 1].lines.contains("Monorail East")) {
+                    monorailRides++;
+                  }
+                }
+
+                bool actuallyRodeMonorail = monorailRides > 0;
+                bool actuallyRodeMetro = (trip.path.length - monorailCount) > 0;
+
+                if (actuallyRodeMetro && actuallyRodeMonorail) {
                   int mPrice = metroCount <= 9
                       ? 10
                       : (metroCount <= 16 ? 12 : (metroCount <= 23 ? 15 : 20));
@@ -92,7 +103,7 @@ class RouteOptionCard extends StatelessWidget {
                   final isAr = Get.locale?.languageCode == 'ar';
                   final detail = isAr
                       ? ' ($monoPrice مونوريل + $mPrice مترو)'
-                      : ' ($monoPrice Monorail + $mPrice Metro)';
+                      : ' ($monoPrice Mono + $mPrice Metro)';
                   priceDisplay += detail;
                 }
 

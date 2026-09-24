@@ -93,6 +93,29 @@ class MetroController extends GetxController {
       return;
     }
 
+    final isStadiumInterchange =
+        (startStationName.value == "Stadium" && endStationName.value == "Stadium (Monorail)") ||
+        (startStationName.value == "Stadium (Monorail)" && endStationName.value == "Stadium");
+
+    if (isStadiumInterchange) {
+      final isAr = Get.locale?.languageCode == 'ar';
+      fastestTrip.value = null;
+      comfortableTrip.value = null;
+      Get.snackbar(
+        isAr ? 'تنبيه' : 'Notice',
+        isAr
+            ? 'أنت بالفعل في منطقة الإستاد! يمكنك الانتقال بين محطتي المترو والمونوريل سيراً خلال 3 دقائق دون الحاجة لركوب قطار.'
+            : 'You are already at Stadium! You can walk between Metro and Monorail stations in ~3 minutes without taking a train.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.amber.shade900,
+        colorText: Colors.white,
+        icon: const Icon(Icons.directions_walk_rounded, color: Colors.white),
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 4),
+      );
+      return;
+    }
+
     selectedRouteIndex.value = 0;
 
     fastestTrip.value = _graphService.calculateTrip(
@@ -118,7 +141,8 @@ class MetroController extends GetxController {
       comfortableTrip.value = comfortableTrip.value!.copyWith(ticketPrice: minFare);
     }
   }
-void saveActiveTrip() {
+
+  void saveActiveTrip() {
     final trip = activeTrip;
     if (trip == null) return;
 
@@ -132,11 +156,11 @@ void saveActiveTrip() {
       }
     }
 
-    final double calculatedMetroPrice = mCount > 0 
-        ? _graphService.calculateTicketPrice(mCount, passengerType.value).toDouble() 
+    final double calculatedMetroPrice = mCount > 0
+        ? _graphService.calculateTicketPrice(mCount, passengerType.value).toDouble()
         : 0.0;
-    final double calculatedMonoPrice = monoCount > 0 
-        ? _graphService.calculateMonorailPrice(monoCount, passengerType.value).toDouble() 
+    final double calculatedMonoPrice = monoCount > 0
+        ? _graphService.calculateMonorailPrice(monoCount, passengerType.value).toDouble()
         : 0.0;
 
     final historyItem = TripHistory(
@@ -169,6 +193,7 @@ void saveActiveTrip() {
       );
     });
   }
+
   void openStartStationMap() {
     if (selectedStartStation != null) {
       LocationService.openStationOnMap(selectedStartStation!);

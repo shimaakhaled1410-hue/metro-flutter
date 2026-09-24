@@ -66,9 +66,14 @@ class AppTranslations extends Translations {
       'metro_map': 'Metro Map',
       'appearance': 'Appearance',
       'dark_mode': 'Dark Mode',
-      'start':'Start',
+      'start': 'Start',
       'metro_title': 'Cairo Metro',
-'your_metro_guide': 'Your smart offline guide to Cairo Metro',
+      'your_metro_guide': 'Your smart offline guide to Cairo Metro',
+      'monorail_to_metro_walk':
+          'Exit the monorail and walk ~3 minutes via the surface pathway to Line 3 Metro station',
+      'metro_to_monorail_walk':
+          'Exit Line 3 Metro and walk ~3 minutes to the Monorail station',
+      'monorail_line': 'Monorail',
     },
     'ar_EG': {
       'app_title': 'مترو القاهرة',
@@ -132,9 +137,14 @@ class AppTranslations extends Translations {
       'metro_map': 'خريطة المترو',
       'appearance': 'المظهر',
       'dark_mode': 'الوضع الداكن',
-      'start':'البداية',
+      'start': 'البداية',
       'metro_title': 'مترو القاهرة',
-'your_metro_guide': 'دليلك الذكي لرحلات مترو القاهرة بدون إنترنت',
+      'your_metro_guide': 'دليلك الذكي لرحلات مترو القاهرة بدون إنترنت',
+      'monorail_to_metro_walk':
+          'اخرج من المونوريل وامشِ نحو 3 دقائق عبر الممر السطحي للوصول إلى محطة مترو الخط الثالث',
+      'metro_to_monorail_walk':
+          'اخرج من مترو الخط الثالث وامشِ نحو 3 دقائق للوصول إلى محطة المونوريل',
+      'monorail_line': 'المونوريل',
     },
   };
 }

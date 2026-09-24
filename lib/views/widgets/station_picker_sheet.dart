@@ -26,11 +26,12 @@ class _StationPickerSheetState extends State<StationPickerSheet>
   static const Color line1Color = Color(0xFF1E88E5);
   static const Color line2Color = Color(0xFFE53935);
   static const Color line3Color = Color(0xFF43A047);
+  static const Color monorailColor = Color(0xFF00897B);
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
   }
 
   @override
@@ -46,17 +47,20 @@ class _StationPickerSheetState extends State<StationPickerSheet>
       names = MetroData.line1Names;
     } else if (lineIndex == 1) {
       names = MetroData.line2Names;
-    } else {
+    } else if (lineIndex == 2) {
       names = {
         ...MetroData.line3Common,
         ...MetroData.line3BranchA,
-        ...MetroData.line3BranchB
+        ...MetroData.line3BranchB,
       }.toList();
+    } else {
+      names = MetroData.monorailEastNames;
     }
 
     return names
-        .map((name) =>
-            MetroData.allStations.firstWhere((st) => st.name == name))
+        .map(
+          (name) => MetroData.allStations.firstWhere((st) => st.name == name),
+        )
         .toList();
   }
 
@@ -70,7 +74,8 @@ class _StationPickerSheetState extends State<StationPickerSheet>
   Color _getStationColor(Station station) {
     if (station.lines.contains('Line 1')) return line1Color;
     if (station.lines.contains('Line 2')) return line2Color;
-    return line3Color;
+    if (station.lines.contains('Line 3')) return line3Color;
+    return monorailColor;
   }
 
   Widget _buildStationTile(Station station, Color indicatorColor) {
@@ -116,7 +121,10 @@ class _StationPickerSheetState extends State<StationPickerSheet>
                     const SizedBox(height: 2),
                     Text(
                       station.lines.join(' | '),
-                      style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey.shade500,
+                      ),
                     ),
                   ],
                 ],
@@ -136,7 +144,9 @@ class _StationPickerSheetState extends State<StationPickerSheet>
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.amber.shade200 : Colors.amber.shade900,
+                    color: isDark
+                        ? Colors.amber.shade200
+                        : Colors.amber.shade900,
                   ),
                 ),
               ),
@@ -238,7 +248,9 @@ class _StationPickerSheetState extends State<StationPickerSheet>
               controller: _searchController,
               decoration: InputDecoration(
                 filled: true,
-                fillColor: isDark ? const Color(0xFF1E222B) : Colors.grey.shade100,
+                fillColor: isDark
+                    ? const Color(0xFF1E222B)
+                    : Colors.grey.shade100,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -264,13 +276,18 @@ class _StationPickerSheetState extends State<StationPickerSheet>
               indicatorColor: primaryColor,
               labelColor: primaryColor,
               unselectedLabelColor: Colors.grey,
+              isScrollable: true,
+              tabAlignment: TabAlignment.start,
               labelStyle: const TextStyle(fontWeight: FontWeight.bold),
               tabs: [
                 Tab(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const CircleAvatar(radius: 4, backgroundColor: line1Color),
+                      const CircleAvatar(
+                        radius: 4,
+                        backgroundColor: line1Color,
+                      ),
                       const SizedBox(width: 6),
                       Text('line_1'.tr),
                     ],
@@ -280,7 +297,10 @@ class _StationPickerSheetState extends State<StationPickerSheet>
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const CircleAvatar(radius: 4, backgroundColor: line2Color),
+                      const CircleAvatar(
+                        radius: 4,
+                        backgroundColor: line2Color,
+                      ),
                       const SizedBox(width: 6),
                       Text('line_2'.tr),
                     ],
@@ -290,9 +310,25 @@ class _StationPickerSheetState extends State<StationPickerSheet>
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const CircleAvatar(radius: 4, backgroundColor: line3Color),
+                      const CircleAvatar(
+                        radius: 4,
+                        backgroundColor: line3Color,
+                      ),
                       const SizedBox(width: 6),
                       Text('line_3'.tr),
+                    ],
+                  ),
+                ),
+                Tab(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const CircleAvatar(
+                        radius: 4,
+                        backgroundColor: monorailColor,
+                      ),
+                      const SizedBox(width: 6),
+                      Text('monorail_line'.tr),
                     ],
                   ),
                 ),
@@ -306,14 +342,13 @@ class _StationPickerSheetState extends State<StationPickerSheet>
                   _buildLineList(0, line1Color),
                   _buildLineList(1, line2Color),
                   _buildLineList(2, line3Color),
+                  _buildLineList(3, monorailColor),
                 ],
               ),
             ),
           ] else ...[
             const SizedBox(height: 8),
-            Expanded(
-              child: _buildGlobalSearchResults(),
-            ),
+            Expanded(child: _buildGlobalSearchResults()),
           ],
         ],
       ),

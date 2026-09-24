@@ -37,7 +37,9 @@ class RouteOptionCard extends StatelessWidget {
           color: bg,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: isSelected ? primary : (isDark ? const Color(0xFF2C3240) : Colors.grey.shade300),
+            color: isSelected
+                ? primary
+                : (isDark ? const Color(0xFF2C3240) : Colors.grey.shade300),
             width: 1.5,
           ),
         ),
@@ -57,17 +59,54 @@ class RouteOptionCard extends StatelessWidget {
               '${trip.stationCount} ${'stations'.tr} • ${trip.estimatedTimeMinutes} ${'est_time'.tr}',
               style: TextStyle(
                 fontSize: 12,
-                color: isSelected ? Colors.white70 : (isDark ? Colors.grey.shade400 : Colors.black87),
+                color: isSelected
+                    ? Colors.white70
+                    : (isDark ? Colors.grey.shade400 : Colors.black87),
               ),
             ),
             const SizedBox(height: 4),
-            Text(
-              '${trip.transferCount} ${'transfers_count'.tr} • ${trip.ticketPrice} ${'ticket'.tr}',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-                color: isSelected ? Colors.white : (isDark ? Colors.white : Colors.black),
-              ),
+            Builder(
+              builder: (context) {
+                int metroCount = 0;
+                int monorailCount = 0;
+                for (var s in trip.path) {
+                  if (s.lines.contains("Monorail East")) {
+                    monorailCount++;
+                  } else {
+                    metroCount++;
+                  }
+                }
+
+                String priceDisplay = '${trip.ticketPrice} ${'ticket'.tr}';
+
+                if (metroCount > 0 && monorailCount > 0) {
+                  int mPrice = metroCount <= 9
+                      ? 10
+                      : (metroCount <= 16 ? 12 : (metroCount <= 23 ? 15 : 20));
+                  int monoPrice = monorailCount <= 5
+                      ? 20
+                      : (monorailCount <= 10
+                            ? 40
+                            : (monorailCount <= 15 ? 55 : 80));
+
+                  final isAr = Get.locale?.languageCode == 'ar';
+                  final detail = isAr
+                      ? ' ($monoPrice مونوريل + $mPrice مترو)'
+                      : ' ($monoPrice Monorail + $mPrice Metro)';
+                  priceDisplay += detail;
+                }
+
+                return Text(
+                  '${trip.transferCount} ${'transfers_count'.tr} • $priceDisplay',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                    color: isSelected
+                        ? Colors.white
+                        : (isDark ? Colors.white : Colors.black),
+                  ),
+                );
+              },
             ),
           ],
         ),

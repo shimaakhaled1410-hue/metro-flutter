@@ -20,6 +20,8 @@ class VerticalTimeline extends StatelessWidget {
       lineList = MetroData.line1Names;
     } else if (line == 'Line 2') {
       lineList = MetroData.line2Names;
+    } else if (line == 'Monorail East') {
+      lineList = MetroData.monorailEastNames;
     } else {
       if (MetroData.line3BranchA.contains(next.name)) {
         return MetroData.allStations
@@ -79,19 +81,37 @@ class VerticalTimeline extends StatelessWidget {
                 final isLast = index == trip.path.length - 1;
 
                 String? transferLine;
+                bool isWalkingTransfer = false;
+
                 if (!isFirst && !isLast) {
-                  final prevLine = _getCommonLine(
-                    trip.path[index - 1],
-                    station,
-                  );
-                  final nextLine = _getCommonLine(
-                    station,
-                    trip.path[index + 1],
-                  );
-                  if (prevLine != nextLine &&
-                      nextLine.isNotEmpty &&
-                      prevLine.isNotEmpty) {
-                    transferLine = nextLine;
+                  final nextStation = trip.path[index + 1];
+
+                  if ((station.name == "Stadium (Monorail)" &&
+                          nextStation.name == "Stadium") ||
+                      (station.name == "Stadium" &&
+                          nextStation.name == "Stadium (Monorail)")) {
+                    transferLine = nextStation.lines.first;
+                    isWalkingTransfer = true;
+                  } else {
+                    final prevLine = _getCommonLine(
+                      trip.path[index - 1],
+                      station,
+                    );
+                    final nextLine = _getCommonLine(station, nextStation);
+                    if (prevLine != nextLine &&
+                        nextLine.isNotEmpty &&
+                        prevLine.isNotEmpty) {
+                      transferLine = nextLine;
+                    }
+                  }
+                }
+
+                String? walkingTransferCustomNote;
+                if (isWalkingTransfer) {
+                  if (station.name == "Stadium (Monorail)") {
+                    walkingTransferCustomNote = 'monorail_to_metro_walk'.tr;
+                  } else if (station.name == "Stadium") {
+                    walkingTransferCustomNote = 'metro_to_monorail_walk'.tr;
                   }
                 }
 
@@ -104,13 +124,27 @@ class VerticalTimeline extends StatelessWidget {
                   }
                 } else if (transferLine != null &&
                     index + 1 < trip.path.length) {
-                  final dir = _getTrainDirection(
-                    transferLine,
-                    station,
-                    trip.path[index + 1],
-                  );
-                  if (dir.isNotEmpty) {
-                    directionInfo = '${'take_line_towards'.tr} $dir';
+                  if (isWalkingTransfer && index + 2 < trip.path.length) {
+                    final nextStation = trip.path[index + 1];
+                    final afterNextStation = trip.path[index + 2];
+                    final line = _getCommonLine(nextStation, afterNextStation);
+                    final dir = _getTrainDirection(
+                      line,
+                      nextStation,
+                      afterNextStation,
+                    );
+                    if (dir.isNotEmpty) {
+                      directionInfo = '${'take_line_towards'.tr} $dir';
+                    }
+                  } else {
+                    final dir = _getTrainDirection(
+                      transferLine,
+                      station,
+                      trip.path[index + 1],
+                    );
+                    if (dir.isNotEmpty) {
+                      directionInfo = '${'take_line_towards'.tr} $dir';
+                    }
                   }
                 }
 
@@ -312,6 +346,53 @@ class VerticalTimeline extends StatelessWidget {
                                       ),
                                     ),
                                   ],
+                                ),
+                              ],
+                              if (walkingTransferCustomNote != null) ...[
+                                const SizedBox(height: 6),
+                                Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 7,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? const Color(0xFF2C2215)
+                                        : const Color(0xFFFFF8E1),
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: Colors.amber.shade700.withValues(
+                                        alpha: 0.4,
+                                      ),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Icon(
+                                        Icons.directions_walk_rounded,
+                                        size: 16,
+                                        color: Colors.amber.shade800,
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Expanded(
+                                        child: Text(
+                                          walkingTransferCustomNote,
+                                          style: TextStyle(
+                                            fontSize: 11.5,
+                                            fontWeight: FontWeight.w600,
+                                            color: isDark
+                                                ? Colors.amber.shade100
+                                                : Colors.brown.shade800,
+                                            height: 1.35,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                               if (directionInfo != null) ...[

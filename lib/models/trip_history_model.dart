@@ -11,6 +11,8 @@ class TripHistory {
   final List<String> routeStations;
   final PassengerType passengerType;
   final String? destinationTag;
+  final double metroPrice;
+  final double monorailPrice;
 
   TripHistory({
     required this.id,
@@ -23,6 +25,8 @@ class TripHistory {
     required this.routeStations,
     this.passengerType = PassengerType.normal,
     this.destinationTag,
+    this.metroPrice = 0.0,
+    this.monorailPrice = 0.0,
   });
 
   Map<String, dynamic> toJson() => {
@@ -36,6 +40,8 @@ class TripHistory {
         'routeStations': routeStations,
         'passengerType': passengerType.name,
         'destinationTag': destinationTag,
+        'metroPrice': metroPrice,
+        'monorailPrice': monorailPrice,
       };
 
   factory TripHistory.fromJson(Map<String, dynamic> json) {
@@ -59,6 +65,8 @@ class TripHistory {
       routeStations: List<String>.from(json['routeStations'] as List),
       passengerType: resolvedType,
       destinationTag: json['destinationTag'] as String?,
+      metroPrice: (json['metroPrice'] as num?)?.toDouble() ?? 0.0,
+      monorailPrice: (json['monorailPrice'] as num?)?.toDouble() ?? 0.0,
     );
   }
 }

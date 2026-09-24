@@ -118,10 +118,26 @@ class MetroController extends GetxController {
       comfortableTrip.value = comfortableTrip.value!.copyWith(ticketPrice: minFare);
     }
   }
-
-  void saveActiveTrip() {
+void saveActiveTrip() {
     final trip = activeTrip;
     if (trip == null) return;
+
+    int mCount = 0;
+    int monoCount = 0;
+    for (var s in trip.path) {
+      if (s.lines.contains("Monorail East")) {
+        monoCount++;
+      } else {
+        mCount++;
+      }
+    }
+
+    final double calculatedMetroPrice = mCount > 0 
+        ? _graphService.calculateTicketPrice(mCount, passengerType.value).toDouble() 
+        : 0.0;
+    final double calculatedMonoPrice = monoCount > 0 
+        ? _graphService.calculateMonorailPrice(monoCount, passengerType.value).toDouble() 
+        : 0.0;
 
     final historyItem = TripHistory(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -130,6 +146,8 @@ class MetroController extends GetxController {
       stationCount: trip.stationCount,
       timeInMinutes: trip.estimatedTimeMinutes,
       price: trip.ticketPrice.toDouble(),
+      metroPrice: calculatedMetroPrice,
+      monorailPrice: calculatedMonoPrice,
       timestamp: DateTime.now(),
       routeStations: trip.path.map((s) => s.name).toList(),
       passengerType: passengerType.value,
@@ -151,7 +169,6 @@ class MetroController extends GetxController {
       );
     });
   }
-
   void openStartStationMap() {
     if (selectedStartStation != null) {
       LocationService.openStationOnMap(selectedStartStation!);

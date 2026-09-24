@@ -154,7 +154,7 @@ class MetroGraphService {
         path: [s],
         stationCount: 1,
         estimatedTimeMinutes: 0,
-        ticketPrice: calculateTicketPrice(1, passengerType),
+        ticketPrice: calculateTotalTripFare([s], passengerType),
         instructions: ['You are already at the destination'],
         transferCount: 0,
       );
@@ -208,9 +208,57 @@ class MetroGraphService {
       path: path,
       stationCount: stationCount,
       estimatedTimeMinutes: time,
-      ticketPrice: calculateTicketPrice(stationCount, passengerType),
+      ticketPrice: calculateTotalTripFare(path, passengerType),
       instructions: generateInstructions(path),
       transferCount: transfers,
     );
+  }
+
+  int calculateMonorailPrice(int stationCount, PassengerType type) {
+    if (stationCount <= 0) return 0;
+    if (type == PassengerType.specialNeeds) return 5;
+
+    int normalPrice;
+    if (stationCount <= 5) {
+      normalPrice = 20;
+    } else if (stationCount <= 10) {
+      normalPrice = 40;
+    } else if (stationCount <= 15) {
+      normalPrice = 55;
+    } else {
+      normalPrice = 80;
+    }
+
+    if (type == PassengerType.senior) {
+      return (normalPrice / 2).ceil();
+    }
+    return normalPrice;
+  }
+
+  int calculateTotalTripFare(List<Station> path, PassengerType passengerType) {
+    if (path.isEmpty) return 0;
+
+    int metroCount = 0;
+    int monorailCount = 0;
+
+    for (var station in path) {
+      if (station.lines.contains("Monorail East")) {
+        monorailCount++;
+      } else {
+        metroCount++;
+      }
+    }
+
+    int metroPrice = 0;
+    if (metroCount > 0) {
+      metroPrice = calculateTicketPrice(metroCount, passengerType);
+    }
+
+    int monorailPrice = 0;
+    if (monorailCount > 0) {
+      monorailPrice = calculateMonorailPrice(monorailCount, passengerType);
+    }
+
+    return metroPrice + monorailPrice;
   }
 }

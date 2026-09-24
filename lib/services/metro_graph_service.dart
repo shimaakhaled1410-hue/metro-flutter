@@ -17,9 +17,12 @@ class MetroGraphService {
     _addBidirectionalEdges(MetroData.line3Common);
     _addBidirectionalEdges(MetroData.line3BranchA);
     _addBidirectionalEdges(MetroData.line3BranchB);
+    _addBidirectionalEdges(MetroData.monorailEastNames);
 
     _addTransfer("Kit Kat", ["El-Tawfiqiya", "Sudan"]);
     _addTransfer("Adly Mansour", ["El Haykestep"]);
+    // Walking transfer between Metro Stadium and Monorail Stadium (~4-5 min walk)
+    _addTransfer("Stadium", ["Stadium (Monorail)"]);
   }
 
   void _addBidirectionalEdges(List<String> stations) {
@@ -118,7 +121,17 @@ class MetroGraphService {
     steps.add('Start at ${path[0].localizedName} ($currentLine)');
 
     for (int i = 1; i < path.length - 1; i++) {
-      String nextLine = _getCommonLine(path[i].name, path[i + 1].name);
+      final currName = path[i].name;
+      final nextName = path[i + 1].name;
+
+      if ((currName == "Stadium" && nextName == "Stadium (Monorail)") ||
+          (currName == "Stadium (Monorail)" && nextName == "Stadium")) {
+        steps.add('Exit and walk ~5 mins to ${path[i + 1].localizedName}');
+        currentLine = _getCommonLine(currName, nextName);
+        continue;
+      }
+
+      String nextLine = _getCommonLine(currName, nextName);
       if (currentLine != nextLine && nextLine.isNotEmpty) {
         steps.add('Transfer at ${path[i].localizedName} to $nextLine');
         currentLine = nextLine;

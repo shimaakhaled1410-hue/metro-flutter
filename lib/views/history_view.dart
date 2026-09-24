@@ -106,7 +106,8 @@ class HistoryView extends StatelessWidget {
             final item = controller.historyList[index];
             final start = _getStationName(item.startStation);
             final destName = _getStationName(item.endStation);
-            final dest = (item.destinationTag != null && item.destinationTag!.isNotEmpty)
+            final dest =
+                (item.destinationTag != null && item.destinationTag!.isNotEmpty)
                 ? '$destName (${item.destinationTag})'
                 : destName;
 
@@ -124,10 +125,7 @@ class HistoryView extends StatelessWidget {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const Icon(
-                          Icons.route,
-                          color: Color(0xFFE53935),
-                        ),
+                        const Icon(Icons.route, color: Color(0xFFE53935)),
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
@@ -146,9 +144,25 @@ class HistoryView extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 8),
-                    Text(
-                      '${item.stationCount} ${'stations'.tr} • ${item.timeInMinutes} ${'est_time'.tr} • ${item.price} ${'ticket'.tr}',
-                      style: const TextStyle(fontWeight: FontWeight.w500),
+                    Builder(
+                      builder: (context) {
+                        String priceText =
+                            '${item.price.toInt()} ${'ticket'.tr}';
+
+                        // عرض تفصيل التذكرة إذا كانت الرحلة تجمع بين المترو والمونوريل
+                        if (item.metroPrice > 0 && item.monorailPrice > 0) {
+                          final isAr = Get.locale?.languageCode == 'ar';
+                          final detail = isAr
+                              ? ' (${item.monorailPrice.toInt()} مونوريل + ${item.metroPrice.toInt()} مترو)'
+                              : ' (${item.monorailPrice.toInt()} Mono + ${item.metroPrice.toInt()} Metro)';
+                          priceText += detail;
+                        }
+
+                        return Text(
+                          '${item.stationCount} ${'stations'.tr} • ${item.timeInMinutes} ${'est_time'.tr} • $priceText',
+                          style: const TextStyle(fontWeight: FontWeight.w500),
+                        );
+                      },
                     ),
                     const SizedBox(height: 12),
                     SizedBox(
@@ -158,7 +172,11 @@ class HistoryView extends StatelessWidget {
                         itemCount: routeList.length,
                         separatorBuilder: (_, _) => const Padding(
                           padding: EdgeInsets.symmetric(horizontal: 4),
-                          child: Icon(Icons.arrow_forward, size: 16, color: Colors.grey),
+                          child: Icon(
+                            Icons.arrow_forward,
+                            size: 16,
+                            color: Colors.grey,
+                          ),
                         ),
                         itemBuilder: (context, rIdx) {
                           return Chip(
@@ -166,7 +184,9 @@ class HistoryView extends StatelessWidget {
                               routeList[rIdx],
                               style: const TextStyle(fontSize: 12),
                             ),
-                            backgroundColor: isDark ? const Color(0xFF252A36) : const Color(0xFFF1F4F9),
+                            backgroundColor: isDark
+                                ? const Color(0xFF252A36)
+                                : const Color(0xFFF1F4F9),
                             side: BorderSide.none,
                           );
                         },

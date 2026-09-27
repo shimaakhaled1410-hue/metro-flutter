@@ -4,7 +4,7 @@ class AppTranslations extends Translations {
   @override
   Map<String, Map<String, String>> get keys => {
     'en_US': {
-      'app_title': 'Cairo Metro',
+      'app_title': 'MonoMetro',
       'starting_point': 'Starting Point',
       'destination': 'Destination',
       'tap_select_start': 'Select starting station',
@@ -49,7 +49,7 @@ class AppTranslations extends Translations {
       'language_title': 'Language',
       'arabic': 'العربية',
       'english': 'English',
-      'welcome_title': 'Welcome to Cairo Metro',
+      'welcome_title': 'Welcome to MonoMetro',
       'welcome_subtitle':
           'Please select your rider category to customize ticket pricing and route preferences.',
       'get_started': 'Continue',
@@ -67,13 +67,16 @@ class AppTranslations extends Translations {
       'appearance': 'Appearance',
       'dark_mode': 'Dark Mode',
       'start': 'Start',
-      'metro_title': 'Cairo Metro',
-      'your_metro_guide': 'Your smart offline guide to Cairo Metro',
+      'metro_title': 'MonoMetro',
+      'your_metro_guide': 'Your smart offline guide to MonoMetro',
       'monorail_to_metro_walk':
           'Exit the monorail and walk ~3 minutes via the surface pathway to Line 3 Metro station',
       'metro_to_monorail_walk':
           'Exit Line 3 Metro and walk ~3 minutes to the Monorail station',
       'monorail_line': 'Monorail',
+      'legal_title': 'About & Legal',
+      'privacy_policy': 'Privacy Policy',
+      'terms_conditions': 'Terms & Conditions',
     },
     'ar_EG': {
       'app_title': 'مترو القاهرة',
@@ -145,6 +148,9 @@ class AppTranslations extends Translations {
       'metro_to_monorail_walk':
           'اخرج من مترو الخط الثالث وامشِ نحو 3 دقائق للوصول إلى محطة المونوريل',
       'monorail_line': 'المونوريل',
+      'legal_title': 'المعلومات القانونية',
+      'privacy_policy': 'سياسة الخصوصية',
+      'terms_conditions': 'الشروط والأحكام',
     },
   };
 }

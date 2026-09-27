@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import '../data/metro_data.dart';
 import '../models/station_model.dart';
@@ -27,11 +28,13 @@ class MetroController extends GetxController {
 
   List<Station> get allStations => MetroData.allStations;
 
-  Station? get selectedStartStation =>
-      startStationName.value.isEmpty ? null : _graphService.getStationByName(startStationName.value);
+  Station? get selectedStartStation => startStationName.value.isEmpty
+      ? null
+      : _graphService.getStationByName(startStationName.value);
 
-  Station? get selectedEndStation =>
-      endStationName.value.isEmpty ? null : _graphService.getStationByName(endStationName.value);
+  Station? get selectedEndStation => endStationName.value.isEmpty
+      ? null
+      : _graphService.getStationByName(endStationName.value);
 
   TripResult? get activeTrip =>
       selectedRouteIndex.value == 0 ? fastestTrip.value : comfortableTrip.value;
@@ -94,8 +97,10 @@ class MetroController extends GetxController {
     }
 
     final isStadiumInterchange =
-        (startStationName.value == "Stadium" && endStationName.value == "Stadium (Monorail)") ||
-        (startStationName.value == "Stadium (Monorail)" && endStationName.value == "Stadium");
+        (startStationName.value == "Stadium" &&
+            endStationName.value == "Stadium (Monorail)") ||
+        (startStationName.value == "Stadium (Monorail)" &&
+            endStationName.value == "Stadium");
 
     if (isStadiumInterchange) {
       final isAr = Get.locale?.languageCode == 'ar';
@@ -133,12 +138,15 @@ class MetroController extends GetxController {
     );
 
     if (fastestTrip.value != null && comfortableTrip.value != null) {
-      final minFare = fastestTrip.value!.ticketPrice < comfortableTrip.value!.ticketPrice
+      final minFare =
+          fastestTrip.value!.ticketPrice < comfortableTrip.value!.ticketPrice
           ? fastestTrip.value!.ticketPrice
           : comfortableTrip.value!.ticketPrice;
 
       fastestTrip.value = fastestTrip.value!.copyWith(ticketPrice: minFare);
-      comfortableTrip.value = comfortableTrip.value!.copyWith(ticketPrice: minFare);
+      comfortableTrip.value = comfortableTrip.value!.copyWith(
+        ticketPrice: minFare,
+      );
     }
   }
 
@@ -157,10 +165,14 @@ class MetroController extends GetxController {
     }
 
     final double calculatedMetroPrice = mCount > 0
-        ? _graphService.calculateTicketPrice(mCount, passengerType.value).toDouble()
+        ? _graphService
+              .calculateTicketPrice(mCount, passengerType.value)
+              .toDouble()
         : 0.0;
     final double calculatedMonoPrice = monoCount > 0
-        ? _graphService.calculateMonorailPrice(monoCount, passengerType.value).toDouble()
+        ? _graphService
+              .calculateMonorailPrice(monoCount, passengerType.value)
+              .toDouble()
         : 0.0;
 
     final historyItem = TripHistory(
@@ -210,9 +222,63 @@ class MetroController extends GetxController {
   Future<void> findNearestToCurrentLocation() async {
     isLoadingLocation.value = true;
     try {
+      final isAr = Get.locale?.languageCode == 'ar';
+
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        Get.snackbar(
+          isAr ? 'تنبيه الموقع' : 'Location Notice',
+          isAr
+              ? 'يرجى فتح خدمة تحديد الموقع (GPS) للتعرف على أقرب محطة إليك.'
+              : 'Please enable Location services (GPS) to find the nearest station.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.amber.shade900,
+          colorText: Colors.white,
+          icon: const Icon(Icons.location_off_rounded, color: Colors.white),
+          margin: const EdgeInsets.all(16),
+          duration: const Duration(seconds: 4),
+        );
+        return;
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          Get.snackbar(
+            isAr ? 'تنبيه الصلاحيات' : 'Permission Notice',
+            isAr
+                ? 'تم رفض إذن الوصول للموقع الجغرافي.'
+                : 'Location permission was denied.',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: const Color(0xFFD32F2F),
+            colorText: Colors.white,
+            margin: const EdgeInsets.all(16),
+          );
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        Get.snackbar(
+          isAr ? 'صلاحيات الموقع' : 'Location Permissions',
+          isAr
+              ? 'صلاحيات الموقع مرفوضة نهائياً من إعدادات الهاتف.'
+              : 'Location permissions are permanently denied from settings.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: const Color(0xFFD32F2F),
+          colorText: Colors.white,
+          margin: const EdgeInsets.all(16),
+        );
+        return;
+      }
+
       final pos = await LocationService.getCurrentPosition();
       if (pos != null) {
-        final nearest = LocationService.findNearestStation(pos.latitude, pos.longitude);
+        final nearest = LocationService.findNearestStation(
+          pos.latitude,
+          pos.longitude,
+        );
         startStationName.value = nearest.name;
       }
     } finally {
@@ -225,7 +291,9 @@ class MetroController extends GetxController {
     if (trimmedPlace.isEmpty) return;
     isSearchingPlace.value = true;
     try {
-      final nearest = await LocationService.findNearestStationToPlace(trimmedPlace);
+      final nearest = await LocationService.findNearestStationToPlace(
+        trimmedPlace,
+      );
       if (nearest != null) {
         selectEndStation(nearest.name, tag: trimmedPlace);
       }

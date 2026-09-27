@@ -22,7 +22,7 @@ void main() async {
   runApp(
     DevicePreview(
       enabled: !kReleaseMode,
-      builder: (context) => CairoMetroApp(
+      builder: (context) => MonoMetroApp(
         initialThemeMode: isDark ? ThemeMode.dark : ThemeMode.light,
         initialLocale: Locale(savedLanguage),
       ),
@@ -30,11 +30,11 @@ void main() async {
   );
 }
 
-class CairoMetroApp extends StatelessWidget {
+class MonoMetroApp extends StatelessWidget {
   final ThemeMode initialThemeMode;
   final Locale initialLocale;
 
-  const CairoMetroApp({
+  const MonoMetroApp({
     super.key,
     required this.initialThemeMode,
     required this.initialLocale,
@@ -47,7 +47,7 @@ class CairoMetroApp extends StatelessWidget {
       locale: initialLocale,
       builder: DevicePreview.appBuilder,
       debugShowCheckedModeBanner: false,
-      title: 'Cairo Metro',
+      title: 'MonoMetro',
       translations: AppTranslations(),
       fallbackLocale: const Locale('en', 'US'),
       theme: AppThemes.lightTheme,

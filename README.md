@@ -1,4 +1,4 @@
-# 🚇 Cairo Metro & Monorail Navigator
+# 🚇 MonoMetro
 
 A modern, offline-first transit guide and multimodal route navigation application for the Greater Cairo transit network (Metro Lines 1, 2, 3 & Monorail East), built with **Flutter** and **GetX**. Designed to provide instant route calculations, walking transfer guidance, accurate multimodal fare breakdown based on official transit tiers, and an intelligent offline area guide.
 

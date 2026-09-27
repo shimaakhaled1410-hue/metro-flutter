@@ -7,7 +7,7 @@
     <key>CFBundleDevelopmentRegion</key>
     <string>$(DEVELOPMENT_LANGUAGE)</string>
     <key>CFBundleDisplayName</key>
-    <string>Cairo Metro</string>
+    <string>MonoMetro</string>
     <key>CFBundleExecutable</key>
     <string>$(EXECUTABLE_NAME)</string>
     <key>CFBundleIdentifier</key>
@@ -15,7 +15,7 @@
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>
-    <string>metro</string>
+    <string>MonoMetro</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
@@ -68,6 +68,6 @@
     </array>
     
     <key>NSLocationWhenInUseUsageDescription</key>
-    <string>This app needs access to your location to find the nearest metro station.</string>
+    <string>This app needs access to your location to find the nearest metro/monorail station.</string>
 </dict>
 </plist>

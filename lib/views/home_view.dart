@@ -41,11 +41,13 @@ class HomeView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Row(
-          mainAxisSize: MainAxisSize.min,
+          // mainAxisSize: MainAxisSize.min,
+          // mainAxisAlignment: MainAxisAlignment.start,
+          // crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Icon(Icons.directions_subway, color: primaryColor),
             const SizedBox(width: 8),
-            Text('app_title'.tr),
+            Text('app_title'.tr, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
           ],
         ),
         actions: [

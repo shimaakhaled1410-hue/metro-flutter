@@ -1,4 +1,4 @@
-package com.example.metro
+package com.shimaakhaled.monometro
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -4,9 +4,9 @@ import 'package:metro/main.dart';
 import 'package:metro/views/splash_view.dart';
 
 void main() {
-  testWidgets('Cairo Metro App launch smoke test', (WidgetTester tester) async {
+  testWidgets('MonoMetro App launch smoke test', (WidgetTester tester) async {
     await tester.pumpWidget(
-      const CairoMetroApp(
+      const MonoMetroApp(
         initialThemeMode: ThemeMode.light,
         initialLocale: Locale('en', 'US'),
       ),

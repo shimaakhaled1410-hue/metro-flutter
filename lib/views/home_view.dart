@@ -171,7 +171,7 @@ class HomeView extends StatelessWidget {
                                 ),
                         ),
                         onPressed: () =>
-                            controller.findNearestToCurrentLocation(),
+                            controller.showNearestStationPicker(),
                       ),
                     ),
                   ],

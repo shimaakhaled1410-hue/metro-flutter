@@ -219,7 +219,7 @@ class MetroController extends GetxController {
     }
   }
 
-  Future<void> findNearestToCurrentLocation() async {
+  Future<void> findNearestToCurrentLocation({String? filterType}) async {
     isLoadingLocation.value = true;
     try {
       final isAr = Get.locale?.languageCode == 'ar';
@@ -229,8 +229,8 @@ class MetroController extends GetxController {
         Get.snackbar(
           isAr ? 'تنبيه الموقع' : 'Location Notice',
           isAr
-              ? 'يرجى فتح خدمة تحديد الموقع (GPS) للتعرف على أقرب محطة إليك.'
-              : 'Please enable Location services (GPS) to find the nearest station.',
+              ? 'للعثور على أقرب محطة إليك (GPS) يرجى فتح خدمة تحديد الموقع'
+              : 'Please enable location services (GPS) to find the nearest station.',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.amber.shade900,
           colorText: Colors.white,
@@ -246,7 +246,7 @@ class MetroController extends GetxController {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
           Get.snackbar(
-            isAr ? 'تنبيه الصلاحيات' : 'Permission Notice',
+            isAr ? 'صلاحيات الموقع' : 'Location Permissions',
             isAr
                 ? 'تم رفض إذن الوصول للموقع الجغرافي.'
                 : 'Location permission was denied.',
@@ -263,7 +263,7 @@ class MetroController extends GetxController {
         Get.snackbar(
           isAr ? 'صلاحيات الموقع' : 'Location Permissions',
           isAr
-              ? 'صلاحيات الموقع مرفوضة نهائياً من إعدادات الهاتف.'
+              ? 'صلاحيات الموقع مرفوضة تماماً من إعدادات الهاتف.'
               : 'Location permissions are permanently denied from settings.',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: const Color(0xFFD32F2F),
@@ -278,6 +278,7 @@ class MetroController extends GetxController {
         final nearest = LocationService.findNearestStation(
           pos.latitude,
           pos.longitude,
+          filterType: filterType,
         );
         startStationName.value = nearest.name;
       }
@@ -311,5 +312,92 @@ class MetroController extends GetxController {
     } finally {
       isSearchingPlace.value = false;
     }
+  }
+
+  void showNearestStationPicker() {
+    final isAr = Get.locale?.languageCode == 'ar';
+
+    Get.bottomSheet(
+      Material(
+        color: Get.theme.scaffoldBackgroundColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                isAr ? 'اختر نوع وسيلة النقل' : 'Select Transit Type',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                isAr
+                    ? 'اختر الوسيلة التي تريد البحث عن أقرب محطة لها'
+                    : 'Choose the transit type to locate nearest station',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+              ),
+              const SizedBox(height: 20),
+              ListTile(
+                leading: const Icon(
+                  Icons.directions_subway_rounded,
+                  color: Color(0xFF1976D2),
+                ),
+                title: Text(isAr ? 'مترو الأنفاق' : 'Metro'),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                tileColor: Colors.grey.withValues(alpha: 0.08),
+                onTap: () {
+                  Get.back();
+                  findNearestToCurrentLocation(filterType: 'metro');
+                },
+              ),
+              const SizedBox(height: 10),
+              ListTile(
+                leading: const Icon(
+                  Icons.train_rounded,
+                  color: Color(0xFF388E3C),
+                ),
+                title: Text(isAr ? 'المونوريل' : 'Monorail'),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                tileColor: Colors.grey.withValues(alpha: 0.08),
+                onTap: () {
+                  Get.back();
+                  findNearestToCurrentLocation(filterType: 'monorail');
+                },
+              ),
+              const SizedBox(height: 10),
+              ListTile(
+                leading: const Icon(
+                  Icons.near_me_rounded,
+                  color: Color(0xFFF57C00),
+                ),
+                title: Text(
+                  isAr ? 'أقرب محطة عموماً (الكل)' : 'Nearest Any (All)',
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                tileColor: Colors.grey.withValues(alpha: 0.08),
+                onTap: () {
+                  Get.back();
+                  findNearestToCurrentLocation(filterType: null);
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+      isScrollControlled: true,
+    );
   }
 }

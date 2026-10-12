@@ -165,11 +165,33 @@ class LocationService {
     );
   }
 
-  static Station findNearestStation(double latitude, double longitude) {
-    Station nearest = MetroData.allStations.first;
+  static Station findNearestStation(
+    double latitude,
+    double longitude, {
+    String? filterType, // 'metro', 'monorail', or null for all
+  }) {
+    List<Station> stations = MetroData.allStations;
+
+    if (filterType == 'metro') {
+      stations = stations
+          .where((s) => !s.name.toLowerCase().contains('monorail') &&
+                        !s.nameAr.contains('مونوريل'))
+          .toList();
+    } else if (filterType == 'monorail') {
+      stations = stations
+          .where((s) => s.name.toLowerCase().contains('monorail') ||
+                        s.nameAr.contains('مونوريل'))
+          .toList();
+    }
+
+    if (stations.isEmpty) {
+      stations = MetroData.allStations;
+    }
+
+    Station nearest = stations.first;
     double minDistance = double.infinity;
 
-    for (var station in MetroData.allStations) {
+    for (var station in stations) {
       double distance = Geolocator.distanceBetween(
         latitude,
         longitude,
@@ -182,6 +204,7 @@ class LocationService {
         nearest = station;
       }
     }
+
     return nearest;
   }
 

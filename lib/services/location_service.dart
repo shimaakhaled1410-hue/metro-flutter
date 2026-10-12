@@ -120,13 +120,26 @@ class LocationService {
   }
 
   static Future<bool> openStationOnMap(Station station) async {
-    final uri = Uri.parse(
-      'https://www.google.com/maps/search/?api=1&query=${station.latitude},${station.longitude}',
-    );
-    if (await canLaunchUrl(uri)) {
-      return await launchUrl(uri, mode: LaunchMode.externalApplication);
+    final urlString =
+        'https://www.google.com/maps/search/?api=1&query=${station.latitude},${station.longitude}';
+    final uri = Uri.parse(urlString);
+
+    try {
+      final launched = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+      if (!launched) {
+        return await launchUrl(uri, mode: LaunchMode.platformDefault);
+      }
+      return launched;
+    } catch (_) {
+      try {
+        return await launchUrl(uri, mode: LaunchMode.platformDefault);
+      } catch (_) {
+        return false;
+      }
     }
-    return false;
   }
 
   static Future<Position?> getCurrentPosition() async {

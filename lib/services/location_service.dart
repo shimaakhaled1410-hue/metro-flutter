@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../data/metro_data.dart';
@@ -18,12 +17,7 @@ class LandmarkItem {
   });
 }
 
-class OutOfCoverageException implements Exception {}
-
-class PlaceNotFoundException implements Exception {}
-
 class LocationService {
-  static const double maxCoverageDistanceKm = 25.0;
 
   static const List<LandmarkItem> popularPlacesList = [
     LandmarkItem(
@@ -280,55 +274,5 @@ class LocationService {
     }
 
     return nearest;
-  }
-
-  static Future<Station?> findNearestStationToPlace(String placeName) async {
-    final query = '$placeName, Egypt';
-
-    List<Location> locations;
-    try {
-      locations = await locationFromAddress(
-        query,
-      ).timeout(const Duration(seconds: 6));
-    } on TimeoutException {
-      rethrow;
-    } catch (_) {
-      try {
-        locations = await locationFromAddress(
-          placeName,
-        ).timeout(const Duration(seconds: 6));
-      } catch (_) {
-        throw PlaceNotFoundException();
-      }
-    }
-
-    if (locations.isEmpty) {
-      throw PlaceNotFoundException();
-    }
-
-    final targetLocation = locations.first;
-    Station? nearestStation;
-    double minDistanceMeters = double.infinity;
-
-    for (final station in MetroData.allStations) {
-      final distance = Geolocator.distanceBetween(
-        targetLocation.latitude,
-        targetLocation.longitude,
-        station.latitude,
-        station.longitude,
-      );
-
-      if (distance < minDistanceMeters) {
-        minDistanceMeters = distance;
-        nearestStation = station;
-      }
-    }
-
-    final minDistanceKm = minDistanceMeters / 1000.0;
-    if (minDistanceKm > maxCoverageDistanceKm) {
-      throw OutOfCoverageException();
-    }
-
-    return nearestStation;
   }
 }

@@ -104,15 +104,7 @@ class AppTranslations extends Translations {
           'Choose the transit type to locate nearest station',
       'metro': 'Metro',
       'monorail': 'Monorail',
-      'place_out_of_range_title': 'Out of Range',
-      'place_out_of_range_desc':
-          'The specified location is outside metro and monorail service area.',
-      'place_not_found_title': 'Place Not Found',
-      'place_not_found_desc':
-          'Could not find this place. Please check the name and try again.',
-      'search_timeout_title': 'Search Timeout',
-      'search_timeout_desc':
-          'Search request timed out. Please check your connection.',
+      'landmarks': 'Famous Landmarks',
     },
     'ar_EG': {
       'app_title': 'مترو القاهرة',
@@ -212,15 +204,7 @@ class AppTranslations extends Translations {
       'choose_transit_type_desc': 'اختر وسيلة النقل لتحديد أقرب محطة إليك',
       'metro': 'مترو الأنفاق',
       'monorail': 'مونوريل العاصمة',
-      'place_out_of_range_title': 'خارج نطاق الخدمة',
-      'place_out_of_range_desc':
-          'المكان المحدد خارج النطاق الجغرافي لشبكة المترو والمونوريل.',
-      'place_not_found_title': 'المكان غير موجود',
-      'place_not_found_desc':
-          'تعذر العثور على المكان، يرجى التأكد من صحة الاسم والمحاولة مجدداً.',
-      'search_timeout_title': 'انتهت المهلة',
-      'search_timeout_desc':
-          'استغرق البحث وقتاً أطول من المتوقع، يرجى التأكد من اتصال الإنترنت.',
+      'landmarks': 'أشهر المعالم',
     },
   };
 }

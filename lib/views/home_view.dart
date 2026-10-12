@@ -12,7 +12,6 @@ class HomeView extends StatelessWidget {
   HomeView({super.key});
 
   final MetroController controller = Get.find<MetroController>();
-  final TextEditingController placeSearchController = TextEditingController();
 
   void _openStationPicker(BuildContext context, {required bool isStart}) {
     showModalBottomSheet(
@@ -41,13 +40,13 @@ class HomeView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Row(
-          // mainAxisSize: MainAxisSize.min,
-          // mainAxisAlignment: MainAxisAlignment.start,
-          // crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Icon(Icons.directions_subway, color: primaryColor),
             const SizedBox(width: 8),
-            Text('app_title'.tr, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            Text(
+              'app_title'.tr,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
           ],
         ),
         actions: [
@@ -170,8 +169,7 @@ class HomeView extends StatelessWidget {
                                   style: TextStyle(color: primaryColor),
                                 ),
                         ),
-                        onPressed: () =>
-                            controller.showNearestStationPicker(),
+                        onPressed: () => controller.showNearestStationPicker(),
                       ),
                     ),
                   ],
@@ -280,98 +278,35 @@ class HomeView extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        IconButton.filledTonal(
-                          style: IconButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            padding: const EdgeInsets.all(12),
-                          ),
-                          icon: const Icon(Icons.explore_rounded, size: 22),
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (_) => LandmarksDialog(
-                                onSelect: (stationName) {
-                                  controller.selectEndStation(stationName);
-                                },
-                              ),
-                            );
-                          },
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: TextField(
-                            controller: placeSearchController,
-                            onChanged: (val) =>
-                                controller.searchPlaceText.value = val.trim(),
-                            style: const TextStyle(fontSize: 14),
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: isDark
-                                  ? const Color(0xFF252A36)
-                                  : const Color(0xFFF1F4F9),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide.none,
-                              ),
-                              hintText: 'going_area_hint'.tr,
-                              prefixIcon: const Icon(
-                                Icons.travel_explore,
-                                size: 18,
-                              ),
-                            ),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        Obx(() {
-                          final bool hasText =
-                              controller.searchPlaceText.value.isNotEmpty;
-                          return ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: hasText
-                                  ? (isDark
-                                        ? const Color(0xFF3B82F6)
-                                        : primaryColor)
-                                  : (isDark
-                                        ? const Color(0xFF232936)
-                                        : Colors.grey.shade300),
-                              foregroundColor: hasText
-                                  ? Colors.white
-                                  : (isDark
-                                        ? Colors.white38
-                                        : Colors.grey.shade600),
-                              elevation: hasText ? 2 : 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            onPressed: hasText
-                                ? () {
-                                    FocusScope.of(context).unfocus();
-                                    controller.findNearestStationForDestination(
-                                      placeSearchController.text,
-                                    );
-                                  }
-                                : null,
-                            child: Obx(
-                              () => controller.isSearchingPlace.value
-                                  ? const SizedBox(
-                                      height: 16,
-                                      width: 16,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Colors.white,
-                                      ),
-                                    )
-                                  : Text('find'.tr),
+                        icon: Icon(
+                          Icons.explore_rounded,
+                          size: 18,
+                          color: primaryColor,
+                        ),
+                        label: Text(
+                          'landmarks'.tr,
+                          style: TextStyle(color: primaryColor),
+                        ),
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (_) => LandmarksDialog(
+                              onSelect: (stationName) {
+                                controller.selectEndStation(stationName);
+                              },
                             ),
                           );
-                        }),
-                      ],
+                        },
+                      ),
                     ),
                   ],
                 ),

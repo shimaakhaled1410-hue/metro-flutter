@@ -15,7 +15,6 @@ dependencies:
 
   # Device Location & Search
   geolocator: ^14.0.0
-  geocoding: ^4.0.0
 
   # Open Maps
   url_launcher: ^6.3.0

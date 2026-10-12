@@ -174,7 +174,7 @@ class MetroGraphService {
       }
 
       for (String neighbor in _adjacencyList[last] ?? []) {
-        if (!current.contains(neighbor) && current.length <= 40) {
+        if (!current.contains(neighbor) && current.length <= 65) {
           queue.add(List.from(current)..add(neighbor));
         }
       }

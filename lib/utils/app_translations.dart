@@ -99,6 +99,10 @@ class AppTranslations extends Translations {
       'stadium_walk_notice':
           'You are already at Stadium! You can walk between Metro and Monorail stations in ~3 minutes without taking a train.',
       'no_internet_search_title': 'Network Error',
+      'select_transit_type': 'Select Transit Type',
+      'choose_transit_type_desc': 'Choose the transit type to locate nearest station',
+      'metro': 'Metro',
+      'monorail': 'Monorail',
     },
     'ar_EG': {
       'app_title': 'مترو القاهرة',
@@ -194,6 +198,10 @@ class AppTranslations extends Translations {
       'stadium_walk_notice':
           'أنت بالفعل في منطقة الإستاد! يمكنك الانتقال بين محطتي المترو والمونوريل سيراً خلال 3 دقائق دون الحاجة لركوب قطار.',
       'no_internet_search_title': 'خطأ في الاتصال',
+      'select_transit_type': 'اختر نوع وسيلة النقل',
+      'choose_transit_type_desc': 'اختر وسيلة النقل لتحديد أقرب محطة إليك',
+      'metro': 'مترو الأنفاق',
+      'monorail': 'مونوريل العاصمة',
     },
   };
 }

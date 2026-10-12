@@ -198,38 +198,18 @@ class MetroController extends GetxController {
     }
   }
 
-  Future<void> findNearestToCurrentLocation({String? filterType}) async {
+  Future<void> findNearestToCurrentLocation(String filterType) async {
+    final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      AppSnackbar.warning(
+        title: 'location_notice_title'.tr,
+        message: 'location_notice_desc'.tr,
+      );
+      return;
+    }
+
     isLoadingLocation.value = true;
     try {
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        AppSnackbar.warning(
-          title: 'location_notice_title'.tr,
-          message: 'location_notice_desc'.tr,
-        );
-        return;
-      }
-
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          AppSnackbar.error(
-            title: 'location_permission_title'.tr,
-            message: 'location_permission_denied'.tr,
-          );
-          return;
-        }
-      }
-
-      if (permission == LocationPermission.deniedForever) {
-        AppSnackbar.error(
-          title: 'location_permission_title'.tr,
-          message: 'location_permission_denied_forever'.tr,
-        );
-        return;
-      }
-
       final pos = await LocationService.getCurrentPosition();
       if (pos != null) {
         final nearest = LocationService.findNearestStation(
@@ -239,6 +219,11 @@ class MetroController extends GetxController {
         );
         startStationName.value = nearest.name;
       }
+    } catch (_) {
+      AppSnackbar.error(
+        title: 'no_internet_search_title'.tr,
+        message: 'no_internet_search_desc'.tr,
+      );
     } finally {
       isLoadingLocation.value = false;
     }
@@ -265,8 +250,35 @@ class MetroController extends GetxController {
     }
   }
 
-  void showNearestStationPicker() {
-    final isAr = Get.locale?.languageCode == 'ar';
+  Future<void> showNearestStationPicker() async {
+    final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      AppSnackbar.warning(
+        title: 'location_notice_title'.tr,
+        message: 'location_notice_desc'.tr,
+      );
+      return;
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        AppSnackbar.error(
+          title: 'location_permission_title'.tr,
+          message: 'location_permission_denied'.tr,
+        );
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      AppSnackbar.error(
+        title: 'location_permission_title'.tr,
+        message: 'location_permission_denied_forever'.tr,
+      );
+      return;
+    }
 
     Get.bottomSheet(
       Material(
@@ -279,7 +291,7 @@ class MetroController extends GetxController {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                isAr ? 'اختر نوع وسيلة النقل' : 'Select Transit Type',
+                'select_transit_type'.tr,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 18,
@@ -288,67 +300,46 @@ class MetroController extends GetxController {
               ),
               const SizedBox(height: 8),
               Text(
-                isAr
-                    ? 'اختر الوسيلة التي تريد البحث عن أقرب محطة لها'
-                    : 'Choose the transit type to locate nearest station',
+                'choose_transit_type_desc'.tr,
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
               ),
               const SizedBox(height: 20),
               ListTile(
                 leading: const Icon(
-                  Icons.directions_subway_rounded,
-                  color: Color(0xFF1976D2),
+                  Icons.subway_rounded,
+                  color: Color(0xFF1F5F5B),
                 ),
-                title: Text(isAr ? 'مترو الأنفاق' : 'Metro'),
+                title: Text('metro'.tr),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
                 tileColor: Colors.grey.withValues(alpha: 0.08),
                 onTap: () {
                   Get.back();
-                  findNearestToCurrentLocation(filterType: 'metro');
+                  findNearestToCurrentLocation('metro');
                 },
               ),
               const SizedBox(height: 10),
               ListTile(
                 leading: const Icon(
                   Icons.train_rounded,
-                  color: Color(0xFF388E3C),
+                  color: Color(0xFFFD5E5C),
                 ),
-                title: Text(isAr ? 'المونوريل' : 'Monorail'),
+                title: Text('monorail'.tr),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
                 tileColor: Colors.grey.withValues(alpha: 0.08),
                 onTap: () {
                   Get.back();
-                  findNearestToCurrentLocation(filterType: 'monorail');
-                },
-              ),
-              const SizedBox(height: 10),
-              ListTile(
-                leading: const Icon(
-                  Icons.near_me_rounded,
-                  color: Color(0xFFF57C00),
-                ),
-                title: Text(
-                  isAr ? 'أقرب محطة عموماً (الكل)' : 'Nearest Any (All)',
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                tileColor: Colors.grey.withValues(alpha: 0.08),
-                onTap: () {
-                  Get.back();
-                  findNearestToCurrentLocation(filterType: null);
+                  findNearestToCurrentLocation('monorail');
                 },
               ),
             ],
           ),
         ),
       ),
-      isScrollControlled: true,
     );
   }
 }

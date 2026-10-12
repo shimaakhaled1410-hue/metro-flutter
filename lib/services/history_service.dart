@@ -9,7 +9,10 @@ class HistoryService {
     final prefs = await SharedPreferences.getInstance();
     final List<String> list = prefs.getStringList(_key) ?? [];
     return list
-        .map((item) => TripHistory.fromJson(jsonDecode(item) as Map<String, dynamic>))
+        .map(
+          (item) =>
+              TripHistory.fromJson(jsonDecode(item) as Map<String, dynamic>),
+        )
         .toList();
   }
 
@@ -17,6 +20,12 @@ class HistoryService {
     final prefs = await SharedPreferences.getInstance();
     final List<String> list = prefs.getStringList(_key) ?? [];
     list.insert(0, jsonEncode(trip.toJson()));
+    await prefs.setStringList(_key, list);
+  }
+
+  static Future<void> saveAllTrips(List<TripHistory> trips) async {
+    final prefs = await SharedPreferences.getInstance();
+    final List<String> list = trips.map((t) => jsonEncode(t.toJson())).toList();
     await prefs.setStringList(_key, list);
   }
 

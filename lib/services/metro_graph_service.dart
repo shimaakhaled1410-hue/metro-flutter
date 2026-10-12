@@ -202,7 +202,39 @@ class MetroGraphService {
         .toList();
     final stationCount = path.length;
     final transfers = countTransfers(chosenPathNames);
-    final time = (stationCount * 2) + (transfers * 5);
+
+    int metroMoves = 0;
+    int monorailMoves = 0;
+    bool hasMonorailTransfer = false;
+
+    for (int i = 0; i < path.length - 1; i++) {
+      final current = path[i];
+      final next = path[i + 1];
+
+      final isCurMono = current.lines.contains("Monorail East");
+      final isNextMono = next.lines.contains("Monorail East");
+
+      if (isCurMono && isNextMono) {
+        monorailMoves++;
+      } else if (!isCurMono && !isNextMono) {
+        metroMoves++;
+      } else {
+        hasMonorailTransfer = true;
+      }
+    }
+
+    // 3 mins per metro station, 4 mins per monorail station
+    // 7 mins for metro-metro transfer, 10 mins for metro-monorail transfer
+    int transferTime = 0;
+    if (transfers > 0) {
+      if (hasMonorailTransfer) {
+        transferTime = 10 + ((transfers - 1) * 7);
+      } else {
+        transferTime = transfers * 7;
+      }
+    }
+
+    final time = (metroMoves * 3) + (monorailMoves * 4) + transferTime;
 
     return TripResult(
       path: path,

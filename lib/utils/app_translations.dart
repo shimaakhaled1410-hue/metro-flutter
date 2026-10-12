@@ -61,7 +61,7 @@ class AppTranslations extends Translations {
       'trip_saved_success': 'Route saved to history successfully',
       'same_station_error': 'Start and destination stations cannot be the same',
       'take_line_towards': 'Take train towards',
-      'interchange_walk': 'Transfer walk (~4 mins)',
+      'interchange_walk': 'Transfer walk & wait (~7 mins)',
       'swap_stations': 'Swap stations',
       'metro_map': 'Metro Map',
       'appearance': 'Appearance',
@@ -70,9 +70,9 @@ class AppTranslations extends Translations {
       'metro_title': 'MonoMetro',
       'your_metro_guide': 'Your smart offline guide to MonoMetro',
       'monorail_to_metro_walk':
-          'Exit the monorail and walk ~3 minutes via the surface pathway to Line 3 Metro station',
+          'Exit Monorail and walk to Line 3 Metro station to purchase ticket (~10 mins)',
       'metro_to_monorail_walk':
-          'Exit Line 3 Metro and walk ~3 minutes to the Monorail station',
+          'Exit Line 3 Metro and walk to Monorail station to purchase ticket (~10 mins)',
       'monorail_line': 'Monorail',
       'legal_title': 'About & Legal',
       'privacy_policy': 'Privacy Policy',
@@ -135,7 +135,7 @@ class AppTranslations extends Translations {
       'trip_saved_success': 'تم حفظ المسار في السجل بنجاح',
       'same_station_error': 'لا يمكن أن تكون محطة البداية هي نفسها محطة الوصول',
       'take_line_towards': 'اركب قطار اتجاه',
-      'interchange_walk': 'تبديل رصيف مشياً (~4 دقائق)',
+      'interchange_walk': 'تبديل رصيف مشياً والانتظار (~7 دقائق)',
       'swap_stations': 'عكس الاتجاه',
       'metro_map': 'خريطة المترو',
       'appearance': 'المظهر',
@@ -144,9 +144,9 @@ class AppTranslations extends Translations {
       'metro_title': 'مترو القاهرة',
       'your_metro_guide': 'دليلك الذكي لرحلات مترو القاهرة بدون إنترنت',
       'monorail_to_metro_walk':
-          'اخرج من المونوريل وامشِ نحو 3 دقائق عبر الممر السطحي للوصول إلى محطة مترو الخط الثالث',
+          'اخرج من المونوريل وامش نحو محطة مترو الخط الثالث لشراء التذكرة (~10 دقائق)',
       'metro_to_monorail_walk':
-          'اخرج من مترو الخط الثالث وامشِ نحو 3 دقائق للوصول إلى محطة المونوريل',
+          'اخرج من مترو الخط الثالث وامش نحو محطة المونوريل لشراء التذكرة (~10 دقائق)',
       'monorail_line': 'المونوريل',
       'legal_title': 'المعلومات القانونية',
       'privacy_policy': 'سياسة الخصوصية',

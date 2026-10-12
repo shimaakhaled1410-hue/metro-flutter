@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:metro/utils/format_time.dart';
 import '../../models/station_model.dart';
 
 class RouteOptionCard extends StatelessWidget {
@@ -56,7 +57,7 @@ class RouteOptionCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              '${trip.stationCount} ${'stations'.tr} • ${trip.estimatedTimeMinutes} ${'est_time'.tr}',
+              '${trip.stationCount} ${'stations'.tr} • ${formatTripDuration(trip.estimatedTimeMinutes)}',
               style: TextStyle(
                 fontSize: 12,
                 color: isSelected

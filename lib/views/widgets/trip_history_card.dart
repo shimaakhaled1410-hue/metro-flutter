@@ -131,7 +131,7 @@ class TripHistoryCard extends StatelessWidget {
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: routeList.length,
-                separatorBuilder: (_, __) => const Padding(
+                separatorBuilder: (_, _) => const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 4),
                   child: Icon(
                     Icons.arrow_forward,

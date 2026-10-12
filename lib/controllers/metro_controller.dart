@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:metro/utils/app_snackbar.dart';
 import '../data/metro_data.dart';
 import '../models/station_model.dart';
 import '../models/trip_history_model.dart';
@@ -73,10 +74,9 @@ class MetroController extends GetxController {
 
   void calculateTrip() {
     if (startStationName.value.isEmpty || endStationName.value.isEmpty) {
-      Get.snackbar(
-        'Warning',
-        'Please select both start and destination stations',
-        snackPosition: SnackPosition.BOTTOM,
+      AppSnackbar.warning(
+        title: 'warning'.tr,
+        message: 'select_both_stations'.tr,
       );
       return;
     }
@@ -84,14 +84,9 @@ class MetroController extends GetxController {
     if (startStationName.value == endStationName.value) {
       fastestTrip.value = null;
       comfortableTrip.value = null;
-      Get.snackbar(
-        'app_title'.tr,
-        'same_station_error'.tr,
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.orange.shade800,
-        colorText: Colors.white,
-        margin: const EdgeInsets.all(16),
-        duration: const Duration(seconds: 2),
+      AppSnackbar.warning(
+        title: 'metro_title'.tr,
+        message: 'same_station_error'.tr,
       );
       return;
     }
@@ -103,20 +98,11 @@ class MetroController extends GetxController {
             endStationName.value == "Stadium");
 
     if (isStadiumInterchange) {
-      final isAr = Get.locale?.languageCode == 'ar';
       fastestTrip.value = null;
       comfortableTrip.value = null;
-      Get.snackbar(
-        isAr ? 'تنبيه' : 'Notice',
-        isAr
-            ? 'أنت بالفعل في منطقة الإستاد! يمكنك الانتقال بين محطتي المترو والمونوريل سيراً خلال 3 دقائق دون الحاجة لركوب قطار.'
-            : 'You are already at Stadium! You can walk between Metro and Monorail stations in ~3 minutes without taking a train.',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.amber.shade900,
-        colorText: Colors.white,
-        icon: const Icon(Icons.directions_walk_rounded, color: Colors.white),
-        margin: const EdgeInsets.all(16),
-        duration: const Duration(seconds: 4),
+      AppSnackbar.warning(
+        title: 'notice'.tr,
+        message: 'stadium_walk_notice'.tr,
       );
       return;
     }
@@ -194,14 +180,9 @@ class MetroController extends GetxController {
       if (Get.isRegistered<HistoryController>()) {
         Get.find<HistoryController>().loadHistory();
       }
-      Get.snackbar(
-        'app_title'.tr,
-        'trip_saved_success'.tr,
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: const Color(0xFF1B3A57),
-        colorText: Colors.white,
-        margin: const EdgeInsets.all(16),
-        duration: const Duration(seconds: 2),
+      AppSnackbar.success(
+        title: 'metro_title'.tr,
+        message: 'trip_saved_success'.tr,
       );
     });
   }
@@ -210,11 +191,9 @@ class MetroController extends GetxController {
     if (selectedStartStation != null) {
       LocationService.openStationOnMap(selectedStartStation!);
     } else {
-      Get.snackbar(
-        'app_title'.tr,
-        'select_dep_station'.tr,
-        snackPosition: SnackPosition.BOTTOM,
-        duration: const Duration(seconds: 2),
+      AppSnackbar.warning(
+        title: 'metro_title'.tr,
+        message: 'select_dep_station'.tr,
       );
     }
   }
@@ -222,21 +201,11 @@ class MetroController extends GetxController {
   Future<void> findNearestToCurrentLocation({String? filterType}) async {
     isLoadingLocation.value = true;
     try {
-      final isAr = Get.locale?.languageCode == 'ar';
-
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        Get.snackbar(
-          isAr ? 'تنبيه الموقع' : 'Location Notice',
-          isAr
-              ? 'للعثور على أقرب محطة إليك (GPS) يرجى فتح خدمة تحديد الموقع'
-              : 'Please enable location services (GPS) to find the nearest station.',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.amber.shade900,
-          colorText: Colors.white,
-          icon: const Icon(Icons.location_off_rounded, color: Colors.white),
-          margin: const EdgeInsets.all(16),
-          duration: const Duration(seconds: 4),
+        AppSnackbar.warning(
+          title: 'location_notice_title'.tr,
+          message: 'location_notice_desc'.tr,
         );
         return;
       }
@@ -245,30 +214,18 @@ class MetroController extends GetxController {
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          Get.snackbar(
-            isAr ? 'صلاحيات الموقع' : 'Location Permissions',
-            isAr
-                ? 'تم رفض إذن الوصول للموقع الجغرافي.'
-                : 'Location permission was denied.',
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: const Color(0xFFD32F2F),
-            colorText: Colors.white,
-            margin: const EdgeInsets.all(16),
+          AppSnackbar.error(
+            title: 'location_permission_title'.tr,
+            message: 'location_permission_denied'.tr,
           );
           return;
         }
       }
 
       if (permission == LocationPermission.deniedForever) {
-        Get.snackbar(
-          isAr ? 'صلاحيات الموقع' : 'Location Permissions',
-          isAr
-              ? 'صلاحيات الموقع مرفوضة تماماً من إعدادات الهاتف.'
-              : 'Location permissions are permanently denied from settings.',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: const Color(0xFFD32F2F),
-          colorText: Colors.white,
-          margin: const EdgeInsets.all(16),
+        AppSnackbar.error(
+          title: 'location_permission_title'.tr,
+          message: 'location_permission_denied_forever'.tr,
         );
         return;
       }
@@ -299,15 +256,9 @@ class MetroController extends GetxController {
         selectEndStation(nearest.name, tag: trimmedPlace);
       }
     } catch (_) {
-      Get.snackbar(
-        'no_internet_search_title'.tr,
-        'no_internet_search_desc'.tr,
-        snackPosition: SnackPosition.BOTTOM,
-        icon: const Icon(Icons.wifi_off_rounded, color: Colors.white),
-        backgroundColor: const Color(0xFFD32F2F),
-        colorText: Colors.white,
-        margin: const EdgeInsets.all(16),
-        duration: const Duration(seconds: 3),
+      AppSnackbar.error(
+        title: 'no_internet_search_title'.tr,
+        message: 'no_internet_search_desc'.tr,
       );
     } finally {
       isSearchingPlace.value = false;

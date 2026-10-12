@@ -77,6 +77,28 @@ class AppTranslations extends Translations {
       'legal_title': 'About & Legal',
       'privacy_policy': 'Privacy Policy',
       'terms_conditions': 'Terms & Conditions',
+      'undo': 'Undo',
+      'route_deleted_title': 'Route Deleted',
+      'route_deleted_desc': 'Route removed from history',
+      'history_cleared_title': 'History Cleared',
+      'history_cleared_desc': 'All routes have been cleared',
+      'location_notice_title': 'Location Notice',
+      'location_notice_desc':
+          'Please enable location services (GPS) to find nearest station.',
+      'location_permission_title': 'Location Permissions',
+      'location_permission_denied': 'Location permission was denied.',
+      'location_permission_denied_forever':
+          'Location permissions are permanently denied from settings.',
+      'no_internet_title': 'Network Error',
+      'no_internet_search_desc':
+          'Could not complete search. Please check your connection.',
+      'warning': 'Warning',
+      'notice': 'Notice',
+      'select_both_stations':
+          'Please select both start and destination stations',
+      'stadium_walk_notice':
+          'You are already at Stadium! You can walk between Metro and Monorail stations in ~3 minutes without taking a train.',
+      'no_internet_search_title': 'Network Error',
     },
     'ar_EG': {
       'app_title': 'مترو القاهرة',
@@ -151,6 +173,27 @@ class AppTranslations extends Translations {
       'legal_title': 'المعلومات القانونية',
       'privacy_policy': 'سياسة الخصوصية',
       'terms_conditions': 'الشروط والأحكام',
+      'undo': 'تراجع',
+      'route_deleted_title': 'تم حذف المسار',
+      'route_deleted_desc': 'تم مسح المسار من السجل',
+      'history_cleared_title': 'تم مسح السجل',
+      'history_cleared_desc': 'تم مسح جميع المسارات بنجاح',
+      'location_notice_title': 'تنبيه الموقع',
+      'location_notice_desc':
+          'للعثور على أقرب محطة إليك (GPS) يرجى تفعيل خدمة تحديد الموقع',
+      'location_permission_title': 'صلاحيات الموقع',
+      'location_permission_denied': 'تم رفض إذن الوصول للموقع الجغرافي.',
+      'location_permission_denied_forever':
+          'صلاحيات الموقع مرفوضة تماماً من إعدادات الهاتف.',
+      'no_internet_title': 'خطأ في الاتصال',
+      'no_internet_search_desc':
+          'تعذر إجراء البحث، يرجى التحقق من اتصال الإنترنت.',
+      'warning': 'تنبيه',
+      'notice': 'تنبيه',
+      'select_both_stations': 'يرجى اختيار محطة البداية ومحطة الوصول',
+      'stadium_walk_notice':
+          'أنت بالفعل في منطقة الإستاد! يمكنك الانتقال بين محطتي المترو والمونوريل سيراً خلال 3 دقائق دون الحاجة لركوب قطار.',
+      'no_internet_search_title': 'خطأ في الاتصال',
     },
   };
 }

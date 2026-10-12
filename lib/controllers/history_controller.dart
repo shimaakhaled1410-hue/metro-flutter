@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/trip_history_model.dart';
 import '../services/history_service.dart';
+import '../utils/app_snackbar.dart';
 
 class HistoryController extends GetxController {
   var historyList = <TripHistory>[].obs;
@@ -24,36 +24,17 @@ class HistoryController extends GetxController {
   }
 
   Future<void> deleteItemWithUndo(TripHistory item, int index) async {
-    // 1. Remove locally
     historyList.removeAt(index);
     await HistoryService.deleteTrip(item.id);
 
-    final isAr = Get.locale?.languageCode == 'ar';
-
-    // 2. Show Snackbar with Undo
-    Get.closeCurrentSnackbar();
-    Get.snackbar(
-      isAr ? 'تم حذف المسار' : 'Route Deleted',
-      isAr ? 'تم مسح المسار من السجل' : 'Route removed from history',
-      snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 4),
-      margin: const EdgeInsets.all(16),
-      mainButton: TextButton(
-        onPressed: () async {
-          Get.closeCurrentSnackbar();
-          // Undo: re-insert at previous position
-          final restoreIndex = index.clamp(0, historyList.length);
-          historyList.insert(restoreIndex, item);
-          await HistoryService.saveAllTrips(historyList);
-        },
-        child: Text(
-          isAr ? 'تراجع' : 'Undo',
-          style: const TextStyle(
-            color: Colors.amber,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
+    AppSnackbar.showWithUndo(
+      title: 'route_deleted_title'.tr,
+      message: 'route_deleted_desc'.tr,
+      onUndo: () async {
+        final restoreIndex = index.clamp(0, historyList.length);
+        historyList.insert(restoreIndex, item);
+        await HistoryService.saveAllTrips(historyList);
+      },
     );
   }
 
@@ -64,30 +45,13 @@ class HistoryController extends GetxController {
     historyList.clear();
     await HistoryService.clearAll();
 
-    final isAr = Get.locale?.languageCode == 'ar';
-
-    Get.closeCurrentSnackbar();
-    Get.snackbar(
-      isAr ? 'تم مسح السجل' : 'History Cleared',
-      isAr ? 'تم مسح جميع المسارات بنجاح' : 'All routes have been cleared',
-      snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 4),
-      margin: const EdgeInsets.all(16),
-      mainButton: TextButton(
-        onPressed: () async {
-          Get.closeCurrentSnackbar();
-          // Undo: restore all
-          historyList.assignAll(backupList);
-          await HistoryService.saveAllTrips(backupList);
-        },
-        child: Text(
-          isAr ? 'تراجع' : 'Undo',
-          style: const TextStyle(
-            color: Colors.amber,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
+    AppSnackbar.showWithUndo(
+      title: 'history_cleared_title'.tr,
+      message: 'history_cleared_desc'.tr,
+      onUndo: () async {
+        historyList.assignAll(backupList);
+        await HistoryService.saveAllTrips(backupList);
+      },
     );
   }
 }

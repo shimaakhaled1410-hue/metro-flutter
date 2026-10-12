@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -232,14 +234,28 @@ class MetroController extends GetxController {
   Future<void> findNearestStationForDestination(String place) async {
     final trimmedPlace = place.trim();
     if (trimmedPlace.isEmpty) return;
+
     isSearchingPlace.value = true;
     try {
-      final nearest = await LocationService.findNearestStationToPlace(
-        trimmedPlace,
-      );
+      final nearest = await LocationService.findNearestStationToPlace(trimmedPlace);
       if (nearest != null) {
         selectEndStation(nearest.name, tag: trimmedPlace);
       }
+    } on OutOfCoverageException {
+      AppSnackbar.warning(
+        title: 'place_out_of_range_title'.tr,
+        message: 'place_out_of_range_desc'.tr,
+      );
+    } on PlaceNotFoundException {
+      AppSnackbar.warning(
+        title: 'place_not_found_title'.tr,
+        message: 'place_not_found_desc'.tr,
+      );
+    } on TimeoutException {
+      AppSnackbar.error(
+        title: 'search_timeout_title'.tr,
+        message: 'search_timeout_desc'.tr,
+      );
     } catch (_) {
       AppSnackbar.error(
         title: 'no_internet_search_title'.tr,

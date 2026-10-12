@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -16,24 +18,90 @@ class LandmarkItem {
   });
 }
 
+class OutOfCoverageException implements Exception {}
+
+class PlaceNotFoundException implements Exception {}
+
 class LocationService {
+  static const double maxCoverageDistanceKm = 25.0;
+
   static const List<LandmarkItem> popularPlacesList = [
-    LandmarkItem(titleEn: 'Abbas El Akkad', titleAr: 'عباس العقاد', stationKeyword: 'Stadium'),
-    LandmarkItem(titleEn: 'Makram Ebeid', titleAr: 'مكرم عبيد', stationKeyword: 'Stadium'),
-    LandmarkItem(titleEn: 'City Stars', titleAr: 'سيتي ستارز', stationKeyword: 'Ahram'),
-    LandmarkItem(titleEn: 'Cairo University', titleAr: 'جامعة القاهرة', stationKeyword: 'Cairo University'),
-    LandmarkItem(titleEn: 'Ain Shams Univ.', titleAr: 'جامعة عين شمس', stationKeyword: 'Sadr'),
-    LandmarkItem(titleEn: 'Tahrir Square', titleAr: 'ميدان التحرير', stationKeyword: 'Sadat'),
-    LandmarkItem(titleEn: 'Downtown', titleAr: 'وسط البلد', stationKeyword: 'Sadat'),
-    LandmarkItem(titleEn: 'Ramses Station', titleAr: 'محطة مصر (رمسيس)', stationKeyword: 'Shohadaa'),
-    LandmarkItem(titleEn: 'Al Azhar & Hussein', titleAr: 'الأزهر والحسين', stationKeyword: 'Bab'),
-    LandmarkItem(titleEn: 'Zamalek', titleAr: 'الزمالك', stationKeyword: 'Safaa'),
-    LandmarkItem(titleEn: 'Mohandessin', titleAr: 'المهندسين', stationKeyword: 'Gamaat'),
-    LandmarkItem(titleEn: 'Nasr City', titleAr: 'مدينة نصر', stationKeyword: 'Stadium'),
-    LandmarkItem(titleEn: 'Heliopolis', titleAr: 'مصر الجديدة', stationKeyword: 'Heliopolis'),
+    LandmarkItem(
+      titleEn: 'Abbas El Akkad',
+      titleAr: 'عباس العقاد',
+      stationKeyword: 'Stadium',
+    ),
+    LandmarkItem(
+      titleEn: 'Makram Ebeid',
+      titleAr: 'مكرم عبيد',
+      stationKeyword: 'Stadium',
+    ),
+    LandmarkItem(
+      titleEn: 'City Stars',
+      titleAr: 'سيتي ستارز',
+      stationKeyword: 'Ahram',
+    ),
+    LandmarkItem(
+      titleEn: 'Cairo University',
+      titleAr: 'جامعة القاهرة',
+      stationKeyword: 'Cairo University',
+    ),
+    LandmarkItem(
+      titleEn: 'Ain Shams Univ.',
+      titleAr: 'جامعة عين شمس',
+      stationKeyword: 'Sadr',
+    ),
+    LandmarkItem(
+      titleEn: 'Tahrir Square',
+      titleAr: 'ميدان التحرير',
+      stationKeyword: 'Sadat',
+    ),
+    LandmarkItem(
+      titleEn: 'Downtown',
+      titleAr: 'وسط البلد',
+      stationKeyword: 'Sadat',
+    ),
+    LandmarkItem(
+      titleEn: 'Ramses Station',
+      titleAr: 'محطة مصر (رمسيس)',
+      stationKeyword: 'Shohadaa',
+    ),
+    LandmarkItem(
+      titleEn: 'Al Azhar & Hussein',
+      titleAr: 'الأزهر والحسين',
+      stationKeyword: 'Bab',
+    ),
+    LandmarkItem(
+      titleEn: 'Zamalek',
+      titleAr: 'الزمالك',
+      stationKeyword: 'Safaa',
+    ),
+    LandmarkItem(
+      titleEn: 'Mohandessin',
+      titleAr: 'المهندسين',
+      stationKeyword: 'Gamaat',
+    ),
+    LandmarkItem(
+      titleEn: 'Nasr City',
+      titleAr: 'مدينة نصر',
+      stationKeyword: 'Stadium',
+    ),
+    LandmarkItem(
+      titleEn: 'Heliopolis',
+      titleAr: 'مصر الجديدة',
+      stationKeyword: 'Heliopolis',
+    ),
     LandmarkItem(titleEn: 'Maadi', titleAr: 'المعادي', stationKeyword: 'Maadi'),
-    LandmarkItem(titleEn: 'Cairo Tower', titleAr: 'برج القاهرة', stationKeyword: 'Opera'),
-    LandmarkItem(titleEn: 'Cairo Airport', titleAr: 'مطار القاهرة', stationKeyword: 'Adly'),
+    LandmarkItem(
+      titleEn: 'Cairo Tower',
+      titleAr: 'برج القاهرة',
+      stationKeyword: 'Opera',
+    ),
+    LandmarkItem(
+      titleEn: 'Cairo Airport',
+      titleAr: 'مطار القاهرة',
+      stationKeyword: 'Adly',
+    ),
   ];
 
   static final Map<String, String> cairoAreasDirectory = {
@@ -174,13 +242,19 @@ class LocationService {
 
     if (filterType == 'metro') {
       stations = stations
-          .where((s) => !s.name.toLowerCase().contains('monorail') &&
-                        !s.nameAr.contains('مونوريل'))
+          .where(
+            (s) =>
+                !s.name.toLowerCase().contains('monorail') &&
+                !s.nameAr.contains('مونوريل'),
+          )
           .toList();
     } else if (filterType == 'monorail') {
       stations = stations
-          .where((s) => s.name.toLowerCase().contains('monorail') ||
-                        s.nameAr.contains('مونوريل'))
+          .where(
+            (s) =>
+                s.name.toLowerCase().contains('monorail') ||
+                s.nameAr.contains('مونوريل'),
+          )
           .toList();
     }
 
@@ -209,44 +283,52 @@ class LocationService {
   }
 
   static Future<Station?> findNearestStationToPlace(String placeName) async {
-    final cleanQuery = placeName.trim().toLowerCase().replaceAll('أ', 'ا').replaceAll('إ', 'ا').replaceAll('ة', 'ه');
+    final query = '$placeName, Egypt';
 
-    for (var entry in cairoAreasDirectory.entries) {
-      final key = entry.key.toLowerCase().replaceAll('أ', 'ا').replaceAll('إ', 'ا').replaceAll('ة', 'ه');
-      if (cleanQuery.contains(key) || key.contains(cleanQuery)) {
-        final station = resolveStationByKeyword(entry.value);
-        if (station != null) return station;
-      }
-    }
-
-    for (var item in popularPlacesList) {
-      final titleEn = item.titleEn.toLowerCase();
-      final titleAr = item.titleAr.replaceAll('أ', 'ا').replaceAll('إ', 'ا').replaceAll('ة', 'ه');
-      if (cleanQuery.contains(titleEn) || titleEn.contains(cleanQuery) ||
-          cleanQuery.contains(titleAr) || titleAr.contains(cleanQuery)) {
-        final station = resolveStationByKeyword(item.stationKeyword);
-        if (station != null) return station;
-      }
-    }
-
+    List<Location> locations;
     try {
-      List<Location> locations = await locationFromAddress('$placeName, Egypt');
-      if (locations.isNotEmpty) {
-        final loc = locations.first;
-        return findNearestStation(loc.latitude, loc.longitude);
-      }
+      locations = await locationFromAddress(
+        query,
+      ).timeout(const Duration(seconds: 6));
+    } on TimeoutException {
+      rethrow;
     } catch (_) {
       try {
-        List<Location> locations = await locationFromAddress(placeName);
-        if (locations.isNotEmpty) {
-          final loc = locations.first;
-          return findNearestStation(loc.latitude, loc.longitude);
-        }
+        locations = await locationFromAddress(
+          placeName,
+        ).timeout(const Duration(seconds: 6));
       } catch (_) {
-        return null;
+        throw PlaceNotFoundException();
       }
     }
 
-    return null;
+    if (locations.isEmpty) {
+      throw PlaceNotFoundException();
+    }
+
+    final targetLocation = locations.first;
+    Station? nearestStation;
+    double minDistanceMeters = double.infinity;
+
+    for (final station in MetroData.allStations) {
+      final distance = Geolocator.distanceBetween(
+        targetLocation.latitude,
+        targetLocation.longitude,
+        station.latitude,
+        station.longitude,
+      );
+
+      if (distance < minDistanceMeters) {
+        minDistanceMeters = distance;
+        nearestStation = station;
+      }
+    }
+
+    final minDistanceKm = minDistanceMeters / 1000.0;
+    if (minDistanceKm > maxCoverageDistanceKm) {
+      throw OutOfCoverageException();
+    }
+
+    return nearestStation;
   }
 }
